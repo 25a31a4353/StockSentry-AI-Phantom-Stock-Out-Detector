@@ -239,6 +239,10 @@
             ✓ ${verifiedCount}/20 Verified
           </div>
 
+          <a href="/StockSentry_AI_Master_Documentation_and_PRD.pdf" target="_blank" download class="btn btn-primary" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-size:12px;padding:6px 12px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border-radius:6px;font-weight:600" title="Download 10-Page Master Project Documentation & PRD">
+            📄 Master PRD (PDF)
+          </a>
+
           <button id="quickExportBtn" class="btn btn-secondary">Export Top 20</button>
         </div>
       </header>
@@ -1612,6 +1616,22 @@
         </div>
       </div>
 
+      <!-- MASTER PROJECT DOCUMENTATION & PRD PDF FEATURED BANNER -->
+      <div class="panel-card" style="border: 2px solid var(--accent-indigo); background: linear-gradient(135deg, rgba(79,70,229,0.06), rgba(124,58,237,0.06)); margin-bottom: 20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px">
+          <div style="max-width:760px">
+            <span class="metric-badge badge-indigo">Publication-Grade Document · 10 Chapters</span>
+            <h3 style="margin-top:8px;font-size:17px;color:var(--text-main)">StockSentry AI — Master Project Documentation & PRD (PDF)</h3>
+            <p style="font-size:13px;color:var(--text-sub);margin-top:6px;line-height:1.6">
+              Complete pin-to-pin specifications: Problem Statement R1, PRD Requirements, System Architecture, Bayesian Poisson Math, Multi-Class Signal Shapes, Rupee Recovery Arithmetic, 16-Module Tour, Store Data Integration Hub, and Step-by-Step Operator Manual.
+            </p>
+          </div>
+          <a href="/StockSentry_AI_Master_Documentation_and_PRD.pdf" target="_blank" download class="btn btn-primary" style="display:inline-flex;align-items:center;gap:8px;padding:12px 22px;font-size:13px;text-decoration:none;font-weight:700">
+            📄 Download Master PRD & Technical PDF
+          </a>
+        </div>
+      </div>
+
       <div class="content-grid-3">
         <div class="panel-card">
           <h3>Daily Top-20 Queue CSV</h3>
@@ -1720,6 +1740,22 @@
         </div>
       </div>
 
+      <!-- MASTER PROJECT DOCUMENTATION & PRD PDF FEATURED BANNER -->
+      <div class="panel-card" style="border: 2px solid var(--accent-indigo); background: linear-gradient(135deg, rgba(79,70,229,0.06), rgba(124,58,237,0.06)); margin-bottom: 20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px">
+          <div>
+            <span class="metric-badge badge-indigo">Official Project Deliverable</span>
+            <h3 style="margin-top:6px;font-size:16px;color:var(--text-main)">Master Project Documentation & PRD (10-Page Technical Manual)</h3>
+            <p style="font-size:13px;color:var(--text-sub);margin-top:4px">
+              Full pin-to-pin documentation including PRD specifications, mathematical derivations, architecture diagrams, and operator playbooks.
+            </p>
+          </div>
+          <a href="/StockSentry_AI_Master_Documentation_and_PRD.pdf" target="_blank" download class="btn btn-primary" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;text-decoration:none;font-size:13px;font-weight:700">
+            📄 Download Master PDF
+          </a>
+        </div>
+      </div>
+
       <div class="content-grid-2">
         <div class="panel-card">
           <h3>The R1 Problem: What is a Phantom Stock-Out?</h3>
@@ -1783,6 +1819,8 @@
           </div>
 
           <div style="padding:6px 12px;background:#f8fafc;border-top:1px solid var(--light-border);display:flex;gap:6px;overflow-x:auto;white-space:nowrap">
+            <button class="copilot-chip" data-quick-ask="Where can I download the Master PRD and Technical Documentation PDF?">📄 Project PRD & PDF</button>
+            <button class="copilot-chip" data-quick-ask="Explain step by step how to use this project">🚀 How to Use</button>
             <button class="copilot-chip" data-quick-ask="Which store data integration option should I choose?">🔌 Integrate Store Data</button>
             <button class="copilot-chip" data-quick-ask="Why is the #1 priority SKU flagged?">❓ Why #1 SKU?</button>
             <button class="copilot-chip" data-quick-ask="Explain the scoring formula">📐 Scoring Formula</button>
@@ -1791,7 +1829,7 @@
           </div>
 
           <div class="copilot-input-area">
-            <input id="copilotInput" class="form-input" style="flex:1" placeholder="Ask about SKU-104, scoring formula, ROI..." />
+            <input id="copilotInput" class="form-input" style="flex:1" placeholder="Ask about SKU-104, scoring formula, ROI, PRD..." />
             <button id="sendCopilotBtn" class="btn btn-primary" style="padding:8px 14px">Send</button>
           </div>
         </div>
@@ -1802,6 +1840,8 @@
   function formatCopilotMarkdown(text) {
     return text
       .replace(/### (.*?)\n/g, '<div style="font-weight:800;color:var(--accent-indigo);margin:6px 0 2px">$1</div>')
+      .replace(/#### (.*?)\n/g, '<div style="font-weight:700;color:var(--text-main);margin:4px 0 2px">$1</div>')
+      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" download style="color:#4f46e5;font-weight:700;text-decoration:underline">$1</a>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/\n\n/g, '<div style="margin-top:6px"></div>')
