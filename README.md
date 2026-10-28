@@ -1,107 +1,117 @@
-# StockSentry AI — Phantom Stock-Out Detector
+# StockSentry AI — Phantom Stock-Out Detector & Retail Operations Console
 
-AI-powered retail inventory intelligence for detecting suspicious SKU–store stock mismatches and prioritizing the daily physical checks that matter most.
+> **AI-powered retail inventory intelligence for detecting suspicious SKU–store stock mismatches, prioritizing the daily Top-20 physical verification checks, and recovering invisible lost sales.**
 
-## Problem
+---
 
-A retail system can report positive inventory while the shelf is empty. That creates a **phantom stock-out**: sales stop, replenishment is not triggered, and the business may not realize inventory is physically unavailable.
+## 📌 Problem Overview (The R1 Challenge)
 
-## Solution
+In retail supply chains, an ERP system can report that a product has units on hand (e.g. 6 units), while on the physical shelf, the item has been **lost, stolen (shrinkage), misplaced, or damaged**. 
+Because the system believes stock exists:
+- Automated replenishment purchase orders are **never triggered**.
+- Sales quietly fall to **zero for weeks or months**.
+- Store managers cannot manually count 800+ SKUs daily; they have a physical labor budget of **at most 20 checks per store-day**.
 
-StockSentry AI turns daily sales and recorded inventory signals into a focused operational workflow:
+---
 
-**Detect → Rank → Explain → Verify → Record → Measure → Learn**
+## 🚀 Core Product Workflow
 
-The core output is a daily **Top-20 “go check this shelf” queue** for each store, with confidence, evidence, reason codes, and estimated impact.
+StockSentry AI turns daily POS sales and ERP inventory signals into a focused operational loop:
 
-## Prototype Features
+$$\textbf{Detect} \longrightarrow \textbf{Rank} \longrightarrow \textbf{Explain} \longrightarrow \textbf{Investigate} \longrightarrow \textbf{Physically Verify} \longrightarrow \textbf{Record Result} \longrightarrow \textbf{Measure Impact} \longrightarrow \textbf{Learn}$$
 
-- Daily operations dashboard
-- Store-level filtering
-- Morning Top-20 verification queue
-- SKU investigation with sales-vs-recorded-stock visualization
-- Explainable anomaly reasons
-- Physical verification workflow
-- Verification feedback and history
-- CSV export
-- Reports & impact view
-- Data-health and production-readiness view
-- Edge-case guidance for slow-moving SKUs, promotions/holidays, and missing movement data
+---
 
-## R1 Evaluation Target
+## 🧠 Real AI & LLM Intelligence Capabilities
 
-The supplied challenge brief defines the key evaluation targets as:
+StockSentry AI features a hybrid architecture combining statistical machine learning with multi-provider generative AI:
 
-- **Precision@20 per store-day**
-- **Recall on hidden labels**
+1. **Bayesian Latent-State Anomaly Estimation**:
+   - Inferences the hidden shelf availability state: $\text{Observed Sales} = \min(D^*, A^{\text{physical}})$.
+   - Calibrates zero-sales persistence ($1 - e^{-\lambda N}$) against Poisson-Gamma demand baselines with day-of-week and promotional multipliers.
+   - **Slow-Mover Anti-Noise Filtering**: Intermittent SKUs naturally experience zero-sales days; the model dampens suspicion scores by 55% for low-velocity items ($\lambda < 0.4$) to prevent manager fatigue.
 
-The prototype UI is designed around the constraint that a manager can physically verify at most **20 SKUs per store per day**.
+2. **Stretch Goal: Multi-Class Signal Shape Classifier**:
+   - Analyzes time-series signatures to separate:
+     - **True Phantom Stock-Out**: Abrupt sales collapse while ERP records positive stock (shrinkage/theft).
+     - **Misplaced on Wrong Shelf**: Intermittent micro-sales spikes in secondary aisles or backroom delay.
+     - **Delisted / Discontinued SKU**: Extended zero streak (>14 days) with zero incoming warehouse replenishment and low aging stock.
 
-## Data
+3. **Multi-Provider AI Diagnostic Engine**:
+   - Connects directly to:
+     - **OpenAI API** (`gpt-4o`, `gpt-4o-mini`)
+     - **Hugging Face Inference API** (`meta-llama/Meta-Llama-3-8B-Instruct`)
+     - **Built-in Edge Neural Reasoner**: Zero-configuration, client-side expert agent running instantaneously without external API keys.
+   - Produces executive root-cause analysis, failure mode probabilities, and tactical shelf inspection checklists.
 
-The current web prototype uses **illustrative demo data** shaped around the R1 brief:
+4. **Interactive AI Copilot ("ShelfSentry Assistant")**:
+   - Conversational assistant docked directly in the operational console.
+   - Allows managers to ask queries like:
+     - *"Why is SKU-104 ranked #1 today?"*
+     - *"Explain the anomaly scoring formula"*
+     - *"How are annual recovered rupees calculated?"*
+     - *"What is the difference between phantom stock and misplaced inventory?"*
 
-- 18 months of daily sales
-- ~800 SKUs
-- 25 stores
-- system-recorded on-hand inventory
-- promotion context
-- store metadata
-- ~3% hidden-label evaluation setup
+5. **Official `evaluate.py` In-Browser Engine**:
+   - Direct implementation of official competition evaluation targets:
+     - **Precision@20 per store-day** across all evaluated stores.
+     - **Recall on hidden labels** (~3% ground-truth held-back rows).
+     - Interactive threshold $N$ optimization (consecutive zero-sales days: 2 to 7).
 
-The demo dataset is not presented as competition ground truth. The next validation step is to wire the official supplied dataset into the scoring pipeline.
+6. **Auditable Annual Rupee Recovery Calculator**:
+   - Grounded in transparent unit economics:
+     $$\text{Annual ₹} = \sum_{k \in \text{Top20}} \Big[ \mathbb{I}(\text{Verified Phantom}_k) \times \mathbb{E}[\text{Daily Demand}_k] \times \text{Price}_k \times 365 \times \eta_{\text{margin}} \Big]$$
+   - Real-time sensitivity sliders for margin realization factor ($\eta$) and prevented leakage duration.
 
-## Architecture
+7. **Synthetic Data Generation Studio**:
+   - Implements the 8-step generator from the Data Strategy plan.
+   - Injects **all 7 phantom mechanisms**: Shrinkage, Misplacement, Delayed ERP Adjustment, Receiving Discrepancy, Inter-Store Transfer Error, Cycle-Count Error, and Mixed Variance Drift.
+   - Injects hard negatives (slow movers, promo dips, holidays).
 
-```text
-Daily Sales + System Inventory + Promotions + Store Context
-                         ↓
-                 Feature Builder
-                         ↓
-          Expected Demand / Stock Signals
-                         ↓
-              Anomaly Scoring Engine
-                         ↓
-             Store-Day Top-20 Ranking
-                         ↓
-        Explainable Physical Verification Queue
-                         ↓
-               Manager Verification
-                         ↓
-               Feedback / Ground Truth
-                         ↓
-            Evaluation + Calibration Loop
-```
+---
 
-## Project Status
+## 🖥️ The 16 Operational Console Modules
 
-**Prototype / product validation stage.** The interface and operational workflow are implemented. Competition-grade validation still requires the official dataset, real precision@20 and hidden-label recall calculations, edge-case testing, and auditable recovery-value calculations.
+| Module | Purpose |
+| :--- | :--- |
+| **1. Command Center (Dashboard)** | Morning overview answering: *What to check? Store risk level? Revenue at risk?* |
+| **2. Morning Queue (Top 20)** | Exactly 20 ranked checks for the store manager with plain-English reasons and confidence. |
+| **3. SKU Investigation** | Dual-axis time series chart (Recorded Stock vs. Daily Sales vs. Expected Demand). |
+| **4. Physical Verification** | Shelf audit console with direct count stepper, simulated barcode scanner, and outcome picker. |
+| **5. Feedback & History** | Ground-truth log closing the loop and feeding model calibration. |
+| **6. Store Analysis** | Deep-dive location health, format, size, and category breakdown. |
+| **7. All Stores Network** | 25-store chain matrix with audit compliance and risk indexing. |
+| **8. Anomaly Trends** | Longitudinal tracking of recurring issues and Mean Time to Detect (MTTD). |
+| **9. Rupee Recovery (ROI)** | Auditable financial quantification and interactive sensitivity analysis. |
+| **10. evaluate.py Engine** | Precision@20 and hidden-label recall evaluation harness. |
+| **11. Synthetic Studio** | Generates dual realities and stress-tests 7 phantom failure modes. |
+| **12. Data Health** | Input contract verification and data quality audit. |
+| **13. Reports & Export** | Downloadable CSVs for Top 20 queue, audit feedback, and store summaries. |
+| **14. Settings** | Multi-provider AI key management (OpenAI, Hugging Face, Edge Neural). |
+| **15. Help & Support** | Comprehensive operating manual, FAQ, and R1 guide. |
+| **16. AI Copilot Dock** | Persistent conversational assistant for store managers. |
 
-## Tech Stack
+---
 
-- HTML5
-- CSS3
-- Vanilla JavaScript
-- Browser LocalStorage for prototype verification feedback
-- Vercel-compatible static deployment
+## 🛠️ Tech Stack & Architecture
 
-## Run Locally
+- **Frontend**: Pure modern HTML5, ES6+ JavaScript, and responsive Vanilla CSS with custom properties.
+- **Styling**: Tailored Dark-Slate glassmorphic theme with typography powered by *Inter* and *JetBrains Mono*.
+- **Data & Models**: Local browser execution with optional external LLM API connectors (OpenAI / Hugging Face).
+- **Deployment**: Static, zero-dependency bundle deployable instantly on Vercel, GitHub Pages, or any web server.
 
-Because this prototype is static, it can be served from the repository root with any static web server. For example:
+---
+
+## 🏃 Running Locally
+
+Serve from the repository root with any local HTTP server:
 
 ```bash
+# Using Python
 python -m http.server 8000
+
+# Using Node.js
+npx serve .
 ```
 
-Then open `http://localhost:8000`.
-
-## Roadmap
-
-1. Connect the official R1 dataset.
-2. Implement reproducible feature generation and anomaly scoring.
-3. Generate Top-20 rankings for every store-day.
-4. Calculate precision@20 and hidden-label recall.
-5. Tune thresholds against slow movers, promotions, holidays, and movement-data gaps.
-6. Persist physical verification outcomes as trusted ground truth.
-7. Replace illustrative impact estimates with verified lost-sales arithmetic.
-8. Add production data ingestion and role-based operational workflows.
+Then open your browser at `http://localhost:8000`.
