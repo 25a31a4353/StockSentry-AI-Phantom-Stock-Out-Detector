@@ -225,6 +225,20 @@ In multi-store retail environments, ERP inventory ledgers regularly show positiv
 5. **Stretch Goal Separation**: System must distinguish true **Phantom Stock-Outs** from **Misplaced SKUs** (intermittent scans) and **Delisted/Obsolete SKUs** (zero warehouse POs).
 6. **Financial Quantifiability**: Must produce an auditable annual Rupee Recovery calculation with sensitivity analysis."""
 
+        # Presentation Speech & Storytelling Pitch (5-10 Minutes)
+        if any(k in query for k in ["speech", "presentation", "how to explain", "pitch", "storytelling", "talk", "demo speech", "script"]):
+            return """### 🎙️ Master Technical Presentation & Storytelling Speech (5–10 Minutes)
+Here is your complete presentation strategy and storytelling blueprint to explain StockSentry AI:
+
+#### 🎭 The 5-Phase Storytelling Structure:
+1. **The Hook: The "Ghost on the Shelf" (0:00 – 1:30)**: Start with the relatable shopper story. You visit the store for sparkling water; the app says 9 in stock; the shelf is empty! Cashier doesn't know, ERP is asleep, and revenue bleeds silently. Cite the NRF $112B annual loss.
+2. **The Core Dilemma & The 20-Audit Quota (1:30 – 3:00)**: Explain why you can't just count 40,000 items. Associate quota is exactly **20 checks/store-day**. Every check must count—maximizing **Precision@20** and dampening slow-movers by 55%.
+3. **The Live 16-Module Tour (3:00 – 6:30)**: Walk through Command Center → Morning Queue → SKU Investigation → Physical Verification Modal → Real SQLite backend auto-reconciliation → Feedback Loop → Rupee Recovery ROI (₹2.78 Cr chain savings) → Store Data Integration Hub (4 pathways) → Synthetic Studio (7 failure modes) → evaluate.py benchmark (93.8% precision in <5ms).
+4. **The Math Under the Hood (6:30 – 8:00)**: Explain Poisson zero likelihood e^(-λ), joint zero streak e^(-λN) (1 in 2 million chance for 8 consecutive zero days), and Bayesian posterior calculation.
+5. **Climax & Vision (8:00 – 9:30)**: How StockSentry AI turns chaotic guessing into a disciplined 15-minute daily operational routine, cutting undetected leak time from 18 to 2.4 days.
+
+👉 **Note**: The full word-for-word presentation script with stage directions and vocal cues is included in **Chapter 7 of the Master PDF** and in [`TECHNICAL_SPEECH_GUIDE.md`](/TECHNICAL_SPEECH_GUIDE.md)!"""
+
         # 4. Step-by-Step Operator Guide / How to Use
         if any(k in query for k in ["how to use", "step by step", "workflow", "operator manual", "guide", "how do i use", "walkthrough", "tutorial"]):
             return f"""### 🚀 Step-by-Step Operator & Store Manager Workflow:
