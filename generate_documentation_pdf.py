@@ -108,11 +108,11 @@ def build_pdf():
         'Heading1_Custom',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=14.5,
-        leading=18.5,
+        fontSize=14,
+        leading=18,
         textColor=dark_navy,
-        spaceBefore=13,
-        spaceAfter=7,
+        spaceBefore=12,
+        spaceAfter=6,
         keepWithNext=True
     )
 
@@ -120,11 +120,11 @@ def build_pdf():
         'Heading2_Custom',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=11,
-        leading=14.5,
+        fontSize=10.5,
+        leading=14,
         textColor=primary_indigo,
-        spaceBefore=10,
-        spaceAfter=4.5,
+        spaceBefore=9,
+        spaceAfter=4,
         keepWithNext=True
     )
 
@@ -132,11 +132,11 @@ def build_pdf():
         'Heading3_Custom',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=9.5,
-        leading=12.5,
+        fontSize=9,
+        leading=12,
         textColor=dark_navy,
-        spaceBefore=6,
-        spaceAfter=3,
+        spaceBefore=5,
+        spaceAfter=2.5,
         keepWithNext=True
     )
 
@@ -144,32 +144,32 @@ def build_pdf():
         'Body_Custom',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=8.5,
-        leading=13,
+        fontSize=8.2,
+        leading=12.5,
         textColor=body_charcoal,
-        spaceAfter=6
+        spaceAfter=5
     )
 
     bullet_style = ParagraphStyle(
         'Bullet_Custom',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=8.2,
-        leading=12.5,
+        fontSize=8,
+        leading=12,
         textColor=body_charcoal,
         leftIndent=14,
         firstLineIndent=-10,
-        spaceAfter=3
+        spaceAfter=2.5
     )
 
     speech_cue_style = ParagraphStyle(
         'SpeechCue',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=8.5,
-        leading=12,
+        fontSize=8.2,
+        leading=11.5,
         textColor=accent_amber,
-        spaceBefore=5,
+        spaceBefore=4,
         spaceAfter=2,
         keepWithNext=True
     )
@@ -178,18 +178,18 @@ def build_pdf():
         'SpeechText',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=8.5,
-        leading=13.5,
+        fontSize=8.2,
+        leading=13,
         textColor=dark_navy,
-        spaceAfter=5
+        spaceAfter=4.5
     )
 
     callout_style = ParagraphStyle(
         'CalloutText',
         parent=styles['Normal'],
         fontName='Helvetica-Oblique',
-        fontSize=8.2,
-        leading=12.5,
+        fontSize=8,
+        leading=12,
         textColor=dark_navy
     )
 
@@ -197,8 +197,8 @@ def build_pdf():
         'CodeStyle',
         parent=styles['Normal'],
         fontName='Courier',
-        fontSize=7.5,
-        leading=10.5,
+        fontSize=7.2,
+        leading=10,
         textColor=colors.HexColor("#1e293b")
     )
 
@@ -206,8 +206,8 @@ def build_pdf():
         'TableHeader',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=7.8,
-        leading=10,
+        fontSize=7.5,
+        leading=9.5,
         textColor=colors.white,
         alignment=1
     )
@@ -216,8 +216,8 @@ def build_pdf():
         'TableCell',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=7.2,
-        leading=10,
+        fontSize=7,
+        leading=9.5,
         textColor=body_charcoal
     )
 
@@ -225,8 +225,8 @@ def build_pdf():
         'TableCellBold',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=7.2,
-        leading=10,
+        fontSize=7,
+        leading=9.5,
         textColor=dark_navy
     )
 
@@ -247,11 +247,11 @@ def build_pdf():
         [Paragraph("<b>System Architecture:</b>", table_cell_bold), Paragraph("Vanilla JS ES6+ SPA / Dual-Theme CSS / Python 3 Multithreaded REST Server / SQLite 3 ACID DB", table_cell_style)],
         [Paragraph("<b>Data Storage:</b>", table_cell_bold), Paragraph("Persistent SQLite 3 (<code>stocksentry.db</code>) with real-time automated ERP ledger write-down", table_cell_style)],
         [Paragraph("<b>Visual Deliverables:</b>", table_cell_bold), Paragraph("Multi-Tier System Architecture Diagram & 5-Step Retail Operations Workflow Infographic", table_cell_style)],
-        [Paragraph("<b>AI Mathematics:</b>", table_cell_bold), Paragraph("Bayesian Latent-State Inference + Poisson Zero-Sales Likelihood + 55% Slow-Mover Dampening", table_cell_style)],
+        [Paragraph("<b>Core Novelty:</b>", table_cell_bold), Paragraph("Zero-Hardware Bayesian Latent State + 55% Slow-Mover Filter + Closed-Loop Auto-Reconciliation", table_cell_style)],
         [Paragraph("<b>Stretch Goal:</b>", table_cell_bold), Paragraph("Multi-Class Signal Separation (Phantom Stock-Out vs Misplaced on Wrong Shelf vs Delisted SKU)", table_cell_style)],
         [Paragraph("<b>Financial ROI:</b>", table_cell_bold), Paragraph("Auditable Rupee Recovery Model with 70% Realization Factor & Sensitivity Matrix", table_cell_style)],
         [Paragraph("<b>Presentation Script:</b>", table_cell_bold), Paragraph("Comprehensive 5–10 Minute Word-for-Word Storytelling Speech with Stage Cues", table_cell_style)],
-        [Paragraph("<b>Release Version:</b>", table_cell_bold), Paragraph("Production Edition v3.2 (Enterprise Retail Ready)", table_cell_style)],
+        [Paragraph("<b>Release Version:</b>", table_cell_bold), Paragraph("Production Edition v3.5 (Enterprise Retail Ready)", table_cell_style)],
         [Paragraph("<b>Publication Date:</b>", table_cell_bold), Paragraph("October 2026", table_cell_style)]
     ]
     meta_table = Table(cover_meta, colWidths=[130, 374])
@@ -259,7 +259,7 @@ def build_pdf():
         ('BACKGROUND', (0,0), (-1,-1), bg_subtle),
         ('BOX', (0,0), (-1,-1), 1, border_color),
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-        ('PADDING', (0,0), (-1,-1), 4.5),
+        ('PADDING', (0,0), (-1,-1), 4),
         ('LINEBELOW', (0,0), (-1,-2), 0.5, border_color),
     ]))
     story.append(meta_table)
@@ -337,84 +337,21 @@ def build_pdf():
     story.append(Paragraph("2. Technical System Architecture & Blueprint", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=border_color, spaceAfter=8))
 
-    story.append(Paragraph("2.1 Multi-Tier Decoupled System Architecture", h2_style))
+    story.append(Paragraph("2.1 Visual Architecture Blueprint Diagram", h2_style))
     story.append(Paragraph(
         "StockSentry AI employs a decoupled, multi-tier reactive architecture that isolates raw high-throughput telemetry ingestion, statistical Bayesian modeling, transactional SQLite persistence, and sub-millisecond client rendering:",
         body_style
     ))
 
-    # Architectural Blueprint Diagram Table
-    arch_diagram_data = [
-        [
-            Paragraph("<b>TIER 1: RETAIL DATA INGESTION &amp; TELEMETRY SOURCES LAYER</b>", table_header_style)
-        ],
-        [
-            Paragraph("<b>[Cloud ERP / WMS API Bridge]</b> SAP S/4HANA &middot; Oracle RMS &middot; Blue Yonder &middot; Microsoft Dynamics &middot; Netsuite (Hourly REST / Webhooks)<br/>"
-                      "<b>[Nightly POS CSV / SFTP Drop]</b> End-of-day sales totals &middot; Midnight system on-hand balances (Automated 03:00 AM batch)<br/>"
-                      "<b>[Associate Handheld Scanners]</b> Zebra TC52/TC57 &middot; Honeywell ScanPal Android PDAs (Real-time barcode scan feed)<br/>"
-                      "<b>[Synthetic Retail Studio]</b> 7-Mode operational failure simulator (Zero-risk sandbox testing environment)", table_cell_style)
-        ],
-        [
-            Paragraph("<b>&darr; Authenticated REST JSON Gateway &amp; Automated Batch Ingestion &darr;</b>", ParagraphStyle('Arrow1', fontName='Helvetica-Bold', fontSize=7.2, leading=9, textColor=primary_indigo, alignment=1))
-        ],
-        [
-            Paragraph("<b>TIER 2: BACKEND REST SERVER &amp; SQLITE 3 PERSISTENCE (server.py &middot; Port 8080)</b>", table_header_style)
-        ],
-        [
-            Paragraph("<b>Production REST Endpoints:</b> <code>/api/status</code> &middot; <code>/api/feedback</code> &middot; <code>/api/verify</code> &middot; <code>/api/evaluate</code> &middot; <code>/api/trends</code> &middot; <code>/api/ingest</code> &middot; <code>/api/copilot</code><br/>"
-                      "<b>SQLite 3 ACID Storage (<code>stocksentry.db</code>):</b><br/>"
-                      "&bull; <code>audit_verifications</code>: Permanent ground-truth physical audit logs, timestamps, auditor names, and discrepancy records<br/>"
-                      "&bull; <code>erp_ledger</code>: Central inventory balances with <b>Real-Time Automated Write-Down Trigger</b> upon confirmed phantoms<br/>"
-                      "&bull; <code>model_metrics</code>: Historical competition Precision@20 benchmarking runs and threshold sweeps", table_cell_style)
-        ],
-        [
-            Paragraph("<b>&darr; Sub-Millisecond Model Retraining &amp; Anomaly Event Dispatch &darr;</b>", ParagraphStyle('Arrow2', fontName='Helvetica-Bold', fontSize=7.2, leading=9, textColor=primary_indigo, alignment=1))
-        ],
-        [
-            Paragraph("<b>TIER 3: CORE ANALYTICAL &amp; BAYESIAN MACHINE LEARNING ENGINE (ai-engine.js)</b>", table_header_style)
-        ],
-        [
-            Paragraph("&bull; <b>Poisson Demand Baseline Model:</b> &lambda;<sub>t</sub> = Base_Mean &times; Weekend_Lift(1.25) &times; Promo_Lift(1.60)<br/>"
-                      "&bull; <b>Bayesian Latent-State Inferencer:</b> Calculates posterior P(&theta;=Phantom | Z<sub>N</sub>) via joint zero streak e<sup>-&sum;&lambda;</sup><br/>"
-                      "&bull; <b>55% Slow-Mover Anti-Noise Filter:</b> Automatically suppresses intermittent goods (&lambda; &lt; 0.4 units/day)<br/>"
-                      "&bull; <b>Multi-Class Signal Separator:</b> Distinguishes true Phantom vs Misplaced vs Delisted SKUs<br/>"
-                      "&bull; <b>evaluate.py Competition Harness:</b> Evaluates 750 store-days in &lt;5ms (Precision@20 &amp; Hidden Recall)<br/>"
-                      "&bull; <b>Auditable CFO Rupee Recovery Calculator:</b> Discrepancy &times; Demand &times; Price &times; 365 &times; 70% Realization Factor", table_cell_style)
-        ],
-        [
-            Paragraph("<b>&darr; Reactive DOM State Sync (AppState Observable Pattern) &darr;</b>", ParagraphStyle('Arrow3', fontName='Helvetica-Bold', fontSize=7.2, leading=9, textColor=primary_indigo, alignment=1))
-        ],
-        [
-            Paragraph("<b>TIER 4: HIGH-PERFORMANCE FRONTEND OPERATIONS CONSOLE (Vanilla SPA)</b>", table_header_style)
-        ],
-        [
-            Paragraph("&bull; <b>Dual-Theme Responsive Shell:</b> Dark Slate Operations Drawer on left + Clean Light Canvas Workspace on right<br/>"
-                      "&bull; <b>16 Operations Modules:</b> Command Center &middot; Morning Queue (Top 20) &middot; SKU Investigation &middot; Verification Modal &middot; Feedback Ledger &middot; Store Analysis &middot; All Stores Network &middot; Trends &middot; ROI &middot; Integrator &middot; Evaluator &middot; Simulator &middot; Health &middot; Reports &middot; Settings &middot; Help<br/>"
-                      "&bull; <b>Real-Time Visualizations:</b> Canvas-rendered velocity sparklines &amp; SVG priority distribution charts<br/>"
-                      "&bull; <b>Autonomous AI Copilot:</b> StockSentryRetailAgent natural language conversational assistant with project RAG", table_cell_style)
-        ]
-    ]
+    # Embed High-Resolution Architecture Diagram Image
+    arch_img_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "stocksentry_architecture_diagram.jpg")
+    if os.path.exists(arch_img_path):
+        story.append(Spacer(1, 4))
+        story.append(Image(arch_img_path, width=490, height=275.6))
+        story.append(Spacer(1, 4))
+        story.append(Paragraph("<i>Figure 2.1: StockSentry AI Multi-Tier Enterprise System Architecture Blueprint Diagram</i>", ParagraphStyle('ImgCaptionArch', fontName='Helvetica-Oblique', fontSize=7.5, textColor=colors.HexColor("#64748b"), alignment=1)))
+        story.append(Spacer(1, 8))
 
-    arch_table = Table(arch_diagram_data, colWidths=[504])
-    arch_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), dark_navy),
-        ('BACKGROUND', (0,3), (-1,3), primary_indigo),
-        ('BACKGROUND', (0,6), (-1,6), dark_navy),
-        ('BACKGROUND', (0,9), (-1,9), primary_indigo),
-        ('BOX', (0,0), (-1,-1), 1, border_color),
-        ('GRID', (0,0), (-1,-1), 0.5, border_color),
-        ('BACKGROUND', (0,1), (-1,1), bg_subtle),
-        ('BACKGROUND', (0,4), (-1,4), bg_subtle),
-        ('BACKGROUND', (0,7), (-1,7), bg_subtle),
-        ('BACKGROUND', (0,10), (-1,10), bg_subtle),
-        ('BACKGROUND', (0,2), (-1,2), colors.white),
-        ('BACKGROUND', (0,5), (-1,5), colors.white),
-        ('BACKGROUND', (0,8), (-1,8), colors.white),
-        ('PADDING', (0,0), (-1,-1), 3),
-    ]))
-    story.append(arch_table)
-
-    story.append(Spacer(1, 8))
     story.append(Paragraph("2.2 REST API Specification & Data Schema", h2_style))
     api_specs = [
         [Paragraph("<b>Endpoint</b>", table_header_style), Paragraph("<b>Method</b>", table_header_style), Paragraph("<b>Request Payload</b>", table_header_style), Paragraph("<b>Response & Action</b>", table_header_style)],
@@ -462,12 +399,87 @@ def build_pdf():
     story.append(PageBreak())
 
     # =========================================================
-    # SECTION 3: MATHEMATICAL FORMULATION & BAYESIAN INFERENCE
+    # SECTION 3: NOVELTY & COMPETITIVE DIFFERENTIATION MATRIX
     # =========================================================
-    story.append(Paragraph("3. Bayesian Latent-State Inference & Mathematics", h1_style))
+    story.append(Paragraph("3. Novelty & Competitive Differentiation Matrix", h1_style))
+    story.append(HRFlowable(width="100%", thickness=1, color=border_color, spaceAfter=8))
+    story.append(Paragraph(
+        "StockSentry AI represents a profound paradigm shift over existing legacy approaches, smart hardware solutions, and basic rule-based inventory alerts:",
+        body_style
+    ))
+
+    nov_data = [
+        [Paragraph("<b>Comparison Dimension</b>", table_header_style), Paragraph("<b>Traditional Periodic Audits (Cycle Counts)</b>", table_header_style), Paragraph("<b>IoT Smart Shelves (RFID & Cameras)</b>", table_header_style), Paragraph("<b>Basic Heuristic Alerts (SAP / JDA)</b>", table_header_style), Paragraph("<b>StockSentry AI Platform (Our Novel Solution)</b>", table_header_style)],
+        [
+            Paragraph("<b>Hardware & CapEx</b>", table_cell_bold),
+            Paragraph("Zero hardware, but massive labor cost (4-6 weeks interval).", table_cell_style),
+            Paragraph("Prohibitive CapEx: $50K–$100K/store for cameras & RFID tags.", table_cell_style),
+            Paragraph("Zero hardware, integrated in legacy ERP.", table_cell_style),
+            Paragraph("<strong style='color:#059669'>100% Zero Hardware / Zero CapEx. Pure software intelligence on existing POS data.</strong>", table_cell_style)
+        ],
+        [
+            Paragraph("<b>Detection Latency</b>", table_cell_bold),
+            Paragraph("18 to 35 undetected leak days before discovery.", table_cell_style),
+            Paragraph("Real-time, but fragile sensors & frequent optical occlusion.", table_cell_style),
+            Paragraph("Delayed: flags items only after fixed calendar days.", table_cell_style),
+            Paragraph("<strong style='color:#059669'>Compresses detection from 18 down to 2.4 days with statistical significance.</strong>", table_cell_style)
+        ],
+        [
+            Paragraph("<b>Human Labor Quota</b>", table_cell_bold),
+            Paragraph("Wall-to-wall shutdown; disrupts normal store operations.", table_cell_style),
+            Paragraph("Requires dedicated hardware maintenance engineers.", table_cell_style),
+            Paragraph("Floods staff with 200+ false alarms daily; ignored by associates.", table_cell_style),
+            Paragraph("<strong style='color:#059669'>Strict 20-Check Human Quota. Prioritized by Precision@20 for maximum ROI in 15 mins.</strong>", table_cell_style)
+        ],
+        [
+            Paragraph("<b>Slow-Mover False Alarms</b>", table_cell_bold),
+            Paragraph("N/A (infrequent manual counts).", table_cell_style),
+            Paragraph("Prone to optical blindspots on bottom shelves.", table_cell_style),
+            Paragraph("Catastrophic: flags intermittent goods as 'dead inventory'.", table_cell_style),
+            Paragraph("<strong style='color:#059669'>Proprietary 55% Slow-Mover Filter (λ &lt; 0.4) eliminates intermittent false positives.</strong>", table_cell_style)
+        ],
+        [
+            Paragraph("<b>Operational Loop</b>", table_cell_bold),
+            Paragraph("Passive clipboard notes; delayed manual ERP keypunching.", table_cell_style),
+            Paragraph("Alerts generated without ERP transaction binding.", table_cell_style),
+            Paragraph("Static report; replenishment remains frozen.", table_cell_style),
+            Paragraph("<strong style='color:#059669'>Closed-Loop Auto-Reconciliation: Sets ERP stock to 0 in real-time, auto-triggering POs!</strong>", table_cell_style)
+        ],
+        [
+            Paragraph("<b>Multi-Class Diagnostic</b>", table_cell_bold),
+            Paragraph("None (cannot diagnose shrinkage vs misplacement).", table_cell_style),
+            Paragraph("Visual only, cannot separate delisted from stolen.", table_cell_style),
+            Paragraph("Binary (0 or 1). Writes off misplaced items mistakenly.", table_cell_style),
+            Paragraph("<strong style='color:#059669'>Multi-Class Signal Geometry: Separates Phantom Theft vs Shelf Misplacement vs Delisted.</strong>", table_cell_style)
+        ],
+        [
+            Paragraph("<b>Synthetic Digital Twin</b>", table_cell_bold),
+            Paragraph("None.", table_cell_style),
+            Paragraph("None.", table_cell_style),
+            Paragraph("None.", table_cell_style),
+            Paragraph("<strong style='color:#059669'>Built-In Synthetic Retail Studio: Simulates 7 real-world retail failure modes.</strong>", table_cell_style)
+        ]
+    ]
+    nov_table = Table(nov_data, colWidths=[90, 100, 100, 100, 114])
+    nov_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), dark_navy),
+        ('BOX', (0,0), (-1,-1), 1, border_color),
+        ('GRID', (0,0), (-1,-1), 0.5, border_color),
+        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ('PADDING', (0,0), (-1,-1), 3),
+        ('BACKGROUND', (4,1), (4,-1), colors.HexColor("#f0fdf4")),
+    ]))
+    story.append(nov_table)
+
+    story.append(PageBreak())
+
+    # =========================================================
+    # SECTION 4: MATHEMATICAL FORMULATION & BAYESIAN INFERENCE
+    # =========================================================
+    story.append(Paragraph("4. Bayesian Latent-State Inference & Mathematics", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=border_color, spaceAfter=8))
 
-    story.append(Paragraph("3.1 Poisson Baseline Modeling with Day-of-Week & Promo Multipliers", h2_style))
+    story.append(Paragraph("4.1 Poisson Baseline Modeling with Day-of-Week & Promo Multipliers", h2_style))
     story.append(Paragraph(
         "Customer checkouts at retail point-of-sale terminals are modeled as an inhomogeneous Poisson process with rate parameter &lambda; (expected units per day). Baseline velocity is computed from non-zero sales over the preceding 21 days, modulated by temporal and promotional factors:",
         body_style
@@ -475,7 +487,7 @@ def build_pdf():
     story.append(Paragraph("&lambda;<sub>t</sub> = Base_Mean &times; DayOfWeek_Multiplier &times; Promo_Lift", code_style))
     story.append(Paragraph("• <b>DayOfWeek_Multiplier</b>: <code>1.25</code> on weekends (Saturday/Sunday peak footfall); <code>0.95</code> on weekdays.<br/>• <b>Promo_Lift</b>: <code>1.60</code> (+60% expected lift) during active promotional campaigns.", bullet_style))
 
-    story.append(Paragraph("3.2 Zero-Sales Probability & Bayesian Posterior Derivation", h2_style))
+    story.append(Paragraph("4.2 Zero-Sales Probability & Bayesian Posterior Derivation", h2_style))
     story.append(Paragraph(
         "Under normal availability (&theta; = Available), the probability of observing 0 customer checkout scans on day t is given by the Poisson mass function:<br/>"
         "<b>P(X<sub>t</sub> = 0 | &theta; = Available, &lambda;<sub>t</sub>) = e<sup>-&lambda;<sub>t</sub></sup></b><br/>"
@@ -508,7 +520,7 @@ def build_pdf():
     story.append(m_table)
 
     story.append(Spacer(1, 6))
-    story.append(Paragraph("3.3 Composite Score Formulation & Slow-Mover Filter", h2_style))
+    story.append(Paragraph("4.3 Composite Score Formulation & Slow-Mover Filter", h2_style))
     story.append(Paragraph(
         "The overall Priority Score (0–100) incorporates multiple physical operational indicators:<br/>"
         "• <b>Zero-Sales Persistence (w<sub>1</sub> = 52%)</b>: Evaluates normalized Poisson shortfall factor (1 - e<sup>-&lambda;N</sup>).<br/>"
@@ -521,9 +533,9 @@ def build_pdf():
     story.append(PageBreak())
 
     # =========================================================
-    # SECTION 4: MULTI-CLASS SIGNAL SEPARATION (STRETCH GOAL)
+    # SECTION 5: MULTI-CLASS SIGNAL SEPARATION (STRETCH GOAL)
     # =========================================================
-    story.append(Paragraph("4. Multi-Class Signal Separation (Stretch Goal)", h1_style))
+    story.append(Paragraph("5. Multi-Class Signal Separation (Stretch Goal)", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=border_color, spaceAfter=8))
 
     story.append(Paragraph(
@@ -565,9 +577,9 @@ def build_pdf():
     story.append(Spacer(1, 8))
 
     # =========================================================
-    # SECTION 5: AUDITABLE RUPEE RECOVERY ARITHMETIC
+    # SECTION 6: AUDITABLE RUPEE RECOVERY ARITHMETIC
     # =========================================================
-    story.append(Paragraph("5. Auditable Rupee Recovery Formulation & ROI", h1_style))
+    story.append(Paragraph("6. Auditable Rupee Recovery Formulation & ROI", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=border_color, spaceAfter=8))
 
     story.append(Paragraph(
@@ -598,9 +610,9 @@ def build_pdf():
     story.append(PageBreak())
 
     # =========================================================
-    # SECTION 6: 16-MODULE WALKTHROUGH & FEATURE BREAKDOWN
+    # SECTION 7: 16-MODULE WALKTHROUGH & FEATURE BREAKDOWN
     # =========================================================
-    story.append(Paragraph("6. Pin-to-Pin Feature Tour: All 16 Modules", h1_style))
+    story.append(Paragraph("7. Pin-to-Pin Feature Tour: All 16 Modules", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=border_color, spaceAfter=8))
 
     modules_data = [
@@ -645,9 +657,9 @@ def build_pdf():
     story.append(PageBreak())
 
     # =========================================================
-    # SECTION 7: MASTER TECHNICAL PRESENTATION & STORYTELLING SPEECH
+    # SECTION 8: MASTER TECHNICAL PRESENTATION & STORYTELLING SPEECH
     # =========================================================
-    story.append(Paragraph("7. Master Technical Presentation Speech (5–10 Minutes)", h1_style))
+    story.append(Paragraph("8. Master Technical Presentation Speech (5–10 Minutes)", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=border_color, spaceAfter=6))
     story.append(Paragraph(
         "<i>Use this word-for-word technical storytelling script to present StockSentry AI to hackathon judges, enterprise retail executives, or store operations teams. Includes vocal cues, timing notes, and stage directions.</i>",
@@ -671,31 +683,32 @@ def build_pdf():
             "If your AI model generates a list of 200 items, it fails in the real world. If your AI model flags slow-moving items—like expensive imported balsamic vinegar that naturally sells only once a week—the associate wastes valuable time checking an item that was never stolen; it was just a slow mover! That is why the primary competition metric is <b>Precision@20</b>. Every single one of those 20 morning checks must hit the bullseye."
         ),
         (
-            "PART 3: THE LIVE SYSTEM WALKTHROUGH — ALL MODULES [3:00 – 6:30]",
+            "PART 3: OUR CORE NOVELTY VS. EXISTING SOLUTIONS [3:00 – 4:15]",
+            "[Stage Direction: Speak with conviction, highlighting our distinct competitive moats.]",
+            "Why is StockSentry AI truly novel compared to everything on the market today?<br/><br/>"
+            "1. <b>Zero Hardware & Zero CapEx:</b> Unlike RFID smart shelves or ceiling camera installations that cost $50,000 to $100,000 per store and destroy retail's thin 2% margins, StockSentry AI requires <b>zero new hardware</b>. It runs directly on the checkout barcode scans and inventory snapshots retailers already collect every day.<br/><br/>"
+            "2. <b>The 55% Slow-Mover Safeguard:</b> Basic rule-based alerts fail because they constantly flag slow-moving catalog SKUs. Our Bayesian model automatically dampens suspicion by 55% for items with demand under 0.4 units/day, protecting the associate's 20-check quota.<br/><br/>"
+            "3. <b>Closed-Loop Automated ERP Write-Down:</b> Other systems just display passive dashboard warnings that get ignored. When an associate confirms a phantom stock-out in StockSentry AI, the server executes a real-time write-down setting ERP stock to 0, instantly waking up the replenishment pipeline!<br/><br/>"
+            "4. <b>Multi-Class Signal Separation:</b> We don't blindly assume all zero sales mean theft. Our signal shape classifier separates true phantom theft from items merely misplaced on adjacent shelves and corporate-delisted products.<br/><br/>"
+            "5. <b>Sub-5 Millisecond Benchmark Performance:</b> Our competition engine evaluates 750 store-days in under 5 milliseconds, proving a remarkable <b>93.8% Precision@20</b>."
+        ),
+        (
+            "PART 4: THE LIVE SYSTEM WALKTHROUGH — ALL 16 MODULES [4:15 – 7:15]",
             "[Stage Direction: Walk through the interface screens step-by-step with enthusiasm.]",
             "Let me take you on a guided tour of how StockSentry AI transforms daily retail operations:<br/><br/>"
             "<b>1. The Daily Command Center:</b> When the store manager logs in at 08:00 AM, they see the bird's-eye view of all 25 stores. Right at the top, they see the phantom alert rate, the 20-bar priority score distribution, and verified recovered revenue.<br/><br/>"
             "<b>2. The Morning Queue (Top 20):</b> At 08:30 AM, before opening the doors, the associate opens today's Morning Queue. StockSentry AI has already analyzed thousands of sales transactions overnight and prioritized exactly 20 items. Each item carries a distinct Bayesian score from 96.4 down to 54.2, clear confidence ratings, and plain-English reasons like: <i>'8 consecutive zero-sales days despite 9 units recorded on hand.'</i><br/><br/>"
             "<b>3. SKU Deep Investigation:</b> If the associate clicks on Priority #1—SKU-104 Sparkling Water—they see full telemetry: 30-day velocity charts, Poisson expected demand, and our multi-class AI diagnostic.<br/><br/>"
             "<b>4. The Physical Verification Modal & Ground-Truth Capture:</b> The associate walks to Aisle 2, Bay 4. They tap 'Verify' on their mobile tablet. They enter what they actually see: 0 units. They select the root cause—Confirmed Phantom Stock-Out—and click Submit.<br/><br/>"
-            "<b>5. Real SQLite Backend & Instant ERP Reconciler:</b> When they tap Submit, something extraordinary happens. The record is permanently saved to our persistent SQLite database (<code>stocksentry.db</code>), and in sub-millisecond real time, an automated write-down call sets the central ERP ledger to 0 units! Replenishment purchase orders are instantly unlocked!<br/><br/>"
+            "<b>5. Real SQLite Backend & Instant ERP Reconciler:</b> When they tap Submit, the record is permanently saved to our persistent SQLite database (<code>stocksentry.db</code>), and in sub-millisecond real time, an automated write-down call sets the central ERP ledger to 0 units! Replenishment purchase orders are instantly unlocked!<br/><br/>"
             "<b>6. Feedback & Learning Loop:</b> The system logs auditor compliance, displays the confusion matrix, and continuously updates Bayesian feature weights.<br/><br/>"
             "<b>7. Rupee Recovery (ROI) Console:</b> We don't invent numbers. Our CFO-auditable formula calculates Discrepancy Units &times; Daily Demand &times; Price &times; 365 Days &times; a 70% Realization Factor. Across our 25-store chain, this recovers over <b>&#8377;2.78 Crore annually</b>!<br/><br/>"
             "<b>8. Store Data Integration Hub:</b> Retailers connect via 4 enterprise pathways: Direct Cloud ERP API for SAP and Oracle, Nightly POS CSV Batch Drop with live drag-and-drop, Zebra PDA Barcode Scanner streaming, or our Synthetic Studio.<br/><br/>"
             "<b>9. Synthetic Retail Studio:</b> We can simulate and stress-test 7 real-world retail failure modes: Shoplifting, Shelf Misplacement, Delayed ERP Write-Off, Inbound Receiving Discrepancies, Inter-Store Transfer Errors, Cycle-Count Errors, and Mixed Drift.<br/><br/>"
-            "<b>10. evaluate.py Benchmark Engine:</b> Evaluates 750 store-days in under 5 milliseconds, proving a remarkable <b>93.8% Precision@20</b> versus just 34.2% for basic heuristics.<br/><br/>"
-            "<b>11. Stretch Goal: Multi-Class Signal Separation:</b> Distinguishes true phantom theft from items misplaced in adjacent aisles and delisted products.<br/><br/>"
-            "<b>12. Dynamic Natural Language Copilot:</b> Powered by StockSentryRetailAgent, answering any question about telemetry, PRD, scoring math, or database status in human conversational language."
+            "<b>10. Dynamic Natural Language Copilot:</b> Powered by StockSentryRetailAgent, answering any question about telemetry, PRD, scoring math, or database status in human conversational language."
         ),
         (
-            "PART 4: THE MATHEMATICAL ENGINE UNDER THE HOOD [6:30 – 8:00]",
-            "[Stage Direction: Speak with intellectual authority and clarity, demystifying the mathematics.]",
-            "Let's look under the hood at the mathematics that makes this possible. We didn't use a black-box machine learning model where nobody knows why an item was flagged. We formulated phantom detection as a <b>Bayesian Latent-State Inference Problem</b>.<br/><br/>"
-            "If an item normally sells 1.8 units a day, Poisson distribution tells us that the probability of seeing 0 sales on 1 day is e<sup>-1.8</sup>, or about 16.5%. That's normal daily variance. But what is the probability of seeing 0 sales for 8 consecutive days? It is e<sup>-14.4</sup>—less than 1 in 2 million! It is statistically impossible that customers suddenly stopped buying unless the shelf is physically empty!<br/><br/>"
-            "We combine this with demand gap ratios, stale inventory penalties, and weekend/promotional lift factors. Crucially, we apply our <b>Slow-Mover Anti-Noise Filter</b>: if an item sells less than 0.4 units a day, its score is dampened by 55%, ensuring our 20-check quota is never wasted on false alarms."
-        ),
-        (
-            "PART 5: CLIMAX & BUSINESS VISION [8:00 – 9:30]",
+            "PART 5: CLIMAX & BUSINESS VISION [7:15 – 9:00]",
             "[Stage Direction: Slow down slightly. Make strong eye contact. Deliver the final inspiring takeaway.]",
             "To conclude: StockSentry AI transforms retail store operations from reactive, blind firefighting into surgical, data-driven daily precision.<br/><br/>"
             "Store associates no longer wander aimlessly through aisles. Every morning, they walk with purpose, armed with the Top 20 highest-impact checks. Phantom stock-out detection time collapses from <b>18 undetected days down to 2.4 days</b>. Empty shelves are replenished before customers walk away. And retail chains protect their margins, their inventory assets, and their customer loyalty.<br/><br/>"
@@ -712,12 +725,12 @@ def build_pdf():
     story.append(PageBreak())
 
     # =========================================================
-    # SECTION 8: ENTERPRISE WORKFLOW DIAGRAM & EXECUTION ENGINE
+    # SECTION 9: ENTERPRISE WORKFLOW DIAGRAM & EXECUTION ENGINE
     # =========================================================
-    story.append(Paragraph("8. Enterprise Retail Operations Workflow Diagram & Execution Engine", h1_style))
+    story.append(Paragraph("9. Enterprise Retail Operations Workflow Diagram & Execution Engine", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=border_color, spaceAfter=8))
     story.append(Paragraph(
-        "The following visual diagram illustrates the 5-phase closed-loop operational workflow of StockSentry AI from raw transaction streams to floor verification and automated ERP replenishment:",
+        "The following visual infographic illustrates the 5-phase closed-loop operational workflow of StockSentry AI from raw transaction streams to floor verification and automated ERP replenishment:",
         body_style
     ))
 
@@ -726,9 +739,9 @@ def build_pdf():
     if os.path.exists(workflow_img_path):
         story.append(Spacer(1, 4))
         story.append(Image(workflow_img_path, width=490, height=275.6))
+        story.append(Spacer(1, 4))
+        story.append(Paragraph("<i>Figure 9.1: StockSentry AI End-to-End Retail Operations 5-Step Closed-Loop Workflow Infographic</i>", ParagraphStyle('ImgCaption', fontName='Helvetica-Oblique', fontSize=7.5, textColor=colors.HexColor("#64748b"), alignment=1)))
         story.append(Spacer(1, 6))
-        story.append(Paragraph("<i>Figure 8.1: StockSentry AI End-to-End Retail Operations 5-Step Closed-Loop Workflow Infographic</i>", ParagraphStyle('ImgCaption', fontName='Helvetica-Oblique', fontSize=7.5, textColor=colors.HexColor("#64748b"), alignment=1)))
-        story.append(Spacer(1, 8))
 
     # Workflow step-by-step table
     wf_matrix_data = [
@@ -777,9 +790,9 @@ def build_pdf():
     story.append(PageBreak())
 
     # =========================================================
-    # SECTION 9: STORE DATA INTEGRATION & DECISION MATRIX
+    # SECTION 10: STORE DATA INTEGRATION & DECISION MATRIX
     # =========================================================
-    story.append(Paragraph("9. Store Data Integration Hub & Decision Architecture", h1_style))
+    story.append(Paragraph("10. Store Data Integration Hub & Decision Architecture", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=border_color, spaceAfter=8))
 
     int_data = [
@@ -822,12 +835,12 @@ def build_pdf():
     story.append(Spacer(1, 8))
 
     # =========================================================
-    # SECTION 10: STEP-BY-STEP OPERATOR MANUAL
+    # SECTION 11: STEP-BY-STEP OPERATOR MANUAL
     # =========================================================
-    story.append(Paragraph("10. Step-by-Step Operator Manual: How to Use StockSentry AI", h1_style))
+    story.append(Paragraph("11. Step-by-Step Operator Manual: How to Use StockSentry AI", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=border_color, spaceAfter=8))
 
-    story.append(Paragraph("10.1 Store Associate Morning Walk Routine (08:00 AM – 08:30 AM)", h2_style))
+    story.append(Paragraph("11.1 Store Associate Morning Walk Routine (08:00 AM – 08:30 AM)", h2_style))
     story.append(Paragraph("<b>Step 1: Open Daily Command Center:</b> Log into <code>http://localhost:8080/</code>. Verify that your assigned store (e.g. S01) and today's date are selected in the top bar.", bullet_style))
     story.append(Paragraph("<b>Step 2: Inspect Priority Score Histogram:</b> Review the 20-bar priority distribution to assess critical risk volume (&ge; 80/100).", bullet_style))
     story.append(Paragraph("<b>Step 3: Open Morning Queue:</b> Click <i>'Open Top-20 Queue'</i> or use the sidebar link to review the ranked 20 physical checks with plain-English reasons.", bullet_style))
@@ -840,17 +853,18 @@ def build_pdf():
     story.append(Spacer(1, 8))
 
     # =========================================================
-    # SECTION 11: PRODUCTION READINESS & COMPLIANCE VERIFICATION
+    # SECTION 12: PRODUCTION READINESS & COMPLIANCE VERIFICATION
     # =========================================================
-    story.append(Paragraph("11. Production Readiness & Compliance Verification", h1_style))
+    story.append(Paragraph("12. Production Readiness & Compliance Verification", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=border_color, spaceAfter=8))
 
     concl_data = [
         [Paragraph("<b>Evaluation Dimension</b>", table_header_style), Paragraph("<b>Implementation Result</b>", table_header_style), Paragraph("<b>Compliance Status</b>", table_header_style)],
         [Paragraph("<b>R1 Challenge Constraints</b>", table_cell_bold), Paragraph("Fixed 20 physical checks per store-day budget; precision@20 scoring metric.", table_cell_style), Paragraph("<strong style='color:#059669'>100% COMPLIANT</strong>", table_cell_style)],
         [Paragraph("<b>Dynamic Ranking & CSV</b>", table_cell_bold), Paragraph("Scores (96.4 to 54.2) and confidences (98% to 55%) are distinct across all 20 items.", table_cell_style), Paragraph("<strong style='color:#059669'>100% COMPLIANT</strong>", table_cell_style)],
-        [Paragraph("<b>Architecture Blueprint</b>", table_cell_bold), Paragraph("Multi-tier decoupled blueprint covering ingestion, REST, SQLite, Bayesian ML, and SPA console.", table_cell_style), Paragraph("<strong style='color:#059669'>100% COMPLIANT</strong>", table_cell_style)],
+        [Paragraph("<b>Visual Architecture Blueprint</b>", table_cell_bold), Paragraph("Embedded high-resolution 4-layer multi-tier architecture diagram infographic.", table_cell_style), Paragraph("<strong style='color:#059669'>100% COMPLIANT</strong>", table_cell_style)],
         [Paragraph("<b>Workflow Infographic</b>", table_cell_bold), Paragraph("Embedded high-resolution 5-step retail operations workflow diagram with execution matrix.", table_cell_style), Paragraph("<strong style='color:#059669'>100% COMPLIANT</strong>", table_cell_style)],
+        [Paragraph("<b>Core Solution Novelty</b>", table_cell_bold), Paragraph("Zero-Hardware + 55% Slow-Mover Filter + Closed-Loop Automated ERP Write-Down.", table_cell_style), Paragraph("<strong style='color:#059669'>100% COMPLIANT</strong>", table_cell_style)],
         [Paragraph("<b>Backend Persistence</b>", table_cell_bold), Paragraph("SQLite 3 (<code>stocksentry.db</code>) with real-time ERP write-down and ground-truth audit log.", table_cell_style), Paragraph("<strong style='color:#059669'>100% COMPLIANT</strong>", table_cell_style)],
         [Paragraph("<b>Financial Formulation</b>", table_cell_bold), Paragraph("CFO-auditable plain-English model with 70% realization factor; zero raw LaTeX/code.", table_cell_style), Paragraph("<strong style='color:#059669'>100% COMPLIANT</strong>", table_cell_style)],
         [Paragraph("<b>Navigation & Performance</b>", table_cell_bold), Paragraph("All 16 console pages navigate instantly; sub-5ms evaluate.py benchmark.", table_cell_style), Paragraph("<strong style='color:#059669'>100% COMPLIANT</strong>", table_cell_style)],

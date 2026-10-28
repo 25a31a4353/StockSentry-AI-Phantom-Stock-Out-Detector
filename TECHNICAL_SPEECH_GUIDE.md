@@ -125,7 +125,25 @@ Docked right at the bottom is our **StockSentry AI Copilot**, powered by `StockS
 
 ---
 
-### 📐 PART 4: THE MATHEMATICAL ENGINE UNDER THE HOOD [6:30 – 8:00]
+### 💎 PART 3.5: THE NOVELTY — HOW STOCKSENTRY OUTCLASSES EXISTING SOLUTIONS [6:00 – 7:15]
+*(Stage Direction: Confidently contrast StockSentry against industry norms. Use hand gestures to emphasize the leap in efficiency.)*
+
+"Now, judges often ask: *'How does StockSentry AI actually compare to existing market solutions?'*
+
+When you look at modern retail, stores are stuck choosing between two flawed extremes:
+1. **Traditional Manual Cycle Counts:** Stores spend hundreds of hours doing periodic random spot counts. It's slow, disruptive, and by the time an auditor reaches Aisle 12, the product has already been missing for 18 days!
+2. **Hardware-Heavy Approaches (RFID & Ceiling Cameras):** Solutions like computer-vision overhead cameras or RFID tags cost between $50,000 and $100,000 per store in capital expenditure, plus battery replacements and camera occlusions. A supermarket operating on 2% margin simply cannot afford RFID tags on a ₹40 bottle of cooking oil.
+3. **Basic ERP Rule Alerts:** Generic inventory software triggers crude alerts whenever an item has zero sales for 3 days. But what happens? In a 30,000-SKU store, it spits out 400 alerts every single morning! 80% of them are harmless slow-movers, so store managers suffer alert fatigue and ignore them completely.
+
+**StockSentry AI delivers four key scientific novelties:**
+- **Novelty 1: Zero CapEx / 100% Software Intelligence:** We need zero new cameras, zero sensors, and zero RFID tags. We extract mathematical signals purely from existing POS scans and ERP ledgers.
+- **Novelty 2: The 55% Slow-Mover Intermittent Demand Filter:** We mathematically distinguish true phantom stock from slow velocity. Products with $\lambda < 0.4$ units/day are dynamically dampened, preserving the associate's precious 20-audit quota.
+- **Novelty 3: Real-Time Two-Way Closed-Loop ERP Write-Down:** Unlike passive reporting dashboards, the moment an associate verifies zero units on their PDA, our SQLite backend executes an instant write-down, instantly waking up supplier purchase orders within milliseconds.
+- **Novelty 4: Multi-Class Signal Geometry:** We don't just say 'item missing'. We differentiate between Shoplifting (clean cliff drop), Shelf Misplacement (erratic adjacent aisle micro-sales), and Delisted SKUs (structural zero demand)."
+
+---
+
+### 📐 PART 4: THE MATHEMATICAL ENGINE UNDER THE HOOD [7:15 – 8:30]
 *(Stage Direction: Speak with intellectual authority and clarity, demystifying the mathematics so anyone can understand.)*
 
 "Now, let's look under the hood at the mathematics that powers this engine.
