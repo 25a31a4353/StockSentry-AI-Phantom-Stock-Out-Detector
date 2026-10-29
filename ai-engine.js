@@ -433,6 +433,11 @@ This store-SKU exhibits a high-confidence anomaly (${record.confidence}%): syste
         return `### 📄 StockSentry AI — Master Project Documentation & PRD (PDF)\nA publication-quality 10-page technical manual and Product Requirements Document (PRD) is available directly from this deployment.\n\n👉 **<a href="/StockSentry_AI_Master_Documentation_and_PRD.pdf" target="_blank" download style="color:#4f46e5;font-weight:700;text-decoration:underline">Click Here to Download Master PRD & Technical Documentation PDF</a>** *(10 Pages, Publication-Grade)*\n\n* **Covers**: Executive Summary, PRD Specifications, Architecture, Poisson-Bayesian Math, Multi-Class Shapes, Rupee Recovery, 16 Modules, Store Integration, and Operator Playbook.`;
       }
 
+      // Demo Video Walkthrough
+      if (lower.includes('video') || lower.includes('demo') || lower.includes('walkthrough') || lower.includes('recording') || lower.includes('watch')) {
+        return `### 🎥 StockSentry AI — Live Demo Video Walkthrough\nA comprehensive 3-minute live walkthrough with authentic professional voiceover and dual English subtitles (.srt & .vtt) is available.\n\n👉 **<a href="/StockSentry_AI_Live_Demo_Walkthrough.mp4" target="_blank" style="color:#4f46e5;font-weight:700;text-decoration:underline">Click Here to Watch/Download 3-Minute Live Demo Video (MP4)</a>**\n\n* **Includes**: Subtitles ([SRT](/StockSentry_AI_Live_Demo_Subtitles.srt), [VTT](/StockSentry_AI_Live_Demo_Subtitles.vtt)), real-time dashboard walkthrough, Top-20 queue, physical count reconciliation, and evaluation metrics.`;
+      }
+
       // PRD & R1 Challenge
       if (lower.includes('prd') || lower.includes('r1') || lower.includes('problem') || lower.includes('requirement') || lower.includes('what is phantom')) {
         return `### 📋 Problem Statement R1 & PRD Specifications:\n* **Problem**: Identifying phantom inventory where ERP records positive stock but physical shelves are empty, blocking automated replenishment.\n* **Key Constraint**: Maximum **20 physical associate audits per store per day**.\n* **Primary Metric**: **Precision@20** optimization (>85% target).\n* **Safeguards**: Slow-moving SKUs (<0.4 units/day) are dampened by 55% to eliminate false alarms.\n* **Stretch Goal**: 3-class signal shape separation (Phantom vs Misplaced vs Delisted).`;

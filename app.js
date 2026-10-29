@@ -243,6 +243,10 @@
             📄 Master PRD (PDF)
           </a>
 
+          <a href="/StockSentry_AI_Live_Demo_Walkthrough.mp4" target="_blank" class="btn btn-secondary" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-size:12px;padding:6px 12px;font-weight:600" title="Watch 3-Minute Live Demo Video Walkthrough">
+            🎥 Demo Video
+          </a>
+
           <button id="quickExportBtn" class="btn btn-secondary">Export Top 20</button>
         </div>
       </header>
@@ -1750,9 +1754,14 @@
               Full pin-to-pin documentation including PRD specifications, mathematical derivations, architecture diagrams, and operator playbooks.
             </p>
           </div>
-          <a href="/StockSentry_AI_Master_Documentation_and_PRD.pdf" target="_blank" download class="btn btn-primary" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;text-decoration:none;font-size:13px;font-weight:700">
-            📄 Download Master PDF
-          </a>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <a href="/StockSentry_AI_Master_Documentation_and_PRD.pdf" target="_blank" download class="btn btn-primary" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;text-decoration:none;font-size:13px;font-weight:700">
+              📄 Download Master PDF
+            </a>
+            <a href="/StockSentry_AI_Live_Demo_Walkthrough.mp4" target="_blank" class="btn btn-secondary" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;text-decoration:none;font-size:13px;font-weight:700">
+              🎥 Watch Demo Video (3m)
+            </a>
+          </div>
         </div>
       </div>
 
@@ -1819,6 +1828,7 @@
           </div>
 
           <div style="padding:6px 12px;background:#f8fafc;border-top:1px solid var(--light-border);display:flex;gap:6px;overflow-x:auto;white-space:nowrap">
+            <button class="copilot-chip" data-quick-ask="Show me the live demo video walkthrough">🎥 Demo Video</button>
             <button class="copilot-chip" data-quick-ask="Where can I download the Master PRD and Technical Documentation PDF?">📄 Project PRD & PDF</button>
             <button class="copilot-chip" data-quick-ask="Explain step by step how to use this project">🚀 How to Use</button>
             <button class="copilot-chip" data-quick-ask="Which store data integration option should I choose?">🔌 Integrate Store Data</button>
