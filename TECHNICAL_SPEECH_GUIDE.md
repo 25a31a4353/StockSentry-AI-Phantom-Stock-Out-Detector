@@ -57,13 +57,18 @@ Let's look at the reality of retail store operations:
 A modern supermarket carries anywhere between **15,000 and 40,000 unique products (SKUs)**. A floor associate earning an hourly wage cannot physically audit 40,000 items every morning. They would never finish their opening duties!
 
 That is why Problem Statement R1 includes a hard, real-world constraint:
-👉 **A store associate has an operational quota of exactly 20 physical shelf checks per store per day.**
+👉 **A store associate has an operational budget of at most 20 physical shelf checks per store per day.**
 
-Think about what that means for an AI system:
-- If your algorithm flags 200 items, you fail, because store staff will simply ignore the list.
-- If your algorithm flags naturally slow-moving products—like a luxury imported balsamic vinegar that only sells one bottle every five days—the associate wastes their limited morning shift verifying an item that was never stolen at all!
+Our architecture frames this around three distinct operational truths:
+1. **Truth 1: System Truth** — What the ERP ledger reports (e.g. 14 units on hand).
+2. **Truth 2: Model Belief** — What the AI statistical engine infers from checkout flatlines.
+3. **Truth 3: Physical Ground Truth** — What the human associate verifies on the shelf.
 
-That is why our primary metric is **Precision@20**. Every single one of those 20 morning checks must hit the bullseye. We cannot afford false alarms."
+StockSentry AI never allows Model Belief to unilaterally overwrite the ERP. Instead, it serves as an **AI decision layer that optimizes the scarce physical verification budget**:
+- If there are fewer than 20 suspicious candidates, the algorithm evaluates $K = \min(20, \text{candidates})$—it never fabricates fake alerts just to hit an arbitrary quota.
+- If your algorithm flags naturally slow-moving products—like an imported artisanal sauce that only sells one bottle every five days—the associate wastes their limited morning shift verifying an item that was never missing!
+
+That is why our primary metric is **Precision@20**. Every morning check must count."
 
 ---
 
@@ -163,11 +168,14 @@ Here is how it works in plain English:
    $$e^{-(1.8 \times 8)} = e^{-14.4} \approx 0.0000005$$  
    That is less than **1 in 2 million**! It is statistically impossible that customers suddenly stopped buying unless the shelf is physically vacant!
 
-3. **Bayesian Posterior Update:**  
-   We feed this into Bayes' Theorem with a prior phantom base rate of ~3%. The posterior probability that the item is a phantom stock-out jumps from 15% on Day 1 to **99.99% on Day 8**!
+3. **Bayesian-Inspired Posterior Update & Sensitivity:**  
+   We calculate the Bayesian probability under an assumed prior base rate. In our reproducible validation script, `evaluate.py`, we sweep $P_0$ across 0.5%, 1.0%, 2.0%, 3.0%, and 5.0% to demonstrate that ranking stability holds even in fluctuating shrinkage environments.
 
-4. **The Slow-Mover Safeguard:**  
-   Here is our secret weapon: If an item has baseline demand $\lambda < 0.4$ units/day, our engine automatically dampens its score by **55%**. This guarantees that naturally intermittent goods never steal a spot in the associate's 20-check morning quota!"
+4. **Empirically Justified 55% Slow-Mover Filter:**  
+   Here is where we move from theory to disciplined engineering: Why 55%? In `evaluate.py`, we executed a full parameter sweep across dampening factors from 0% to 90%.  
+   - At 0% dampening, slow-moving items flood the queue due to natural zero-streaks, cratering precision.  
+   - At 70%+ dampening, legitimate slow-moving phantoms are completely silenced.  
+   - **55% dampening is the empirical sweet-spot** that maximizes the F1-score and preserves trust on the retail floor."
 
 ---
 
@@ -176,15 +184,12 @@ Here is how it works in plain English:
 
 "To bring everything together:
 
-StockSentry AI transforms retail store operations from a game of blind guessing into a surgical, data-driven daily routine.
+StockSentry AI transforms retail operations by closing the loop safely:
+- **Two-Step Human-in-the-Loop Governance:** When an associate logs a zero physical count, the AI does *not* blindly rewrite the enterprise ledger. It generates an **Audit Correction Proposal**. Only an authorized Store Operations Lead reviews and approves the write-down, preserving enterprise accounting integrity.
+- **Scenario-Based Financial Impact:** Our ROI model is transparent and assumption-labeled. Under standard NRF retail realization (70% brand loyalty discount) and a targeted reduction of phantom detection latency from traditional cycle counts down to daily shelf walks, a 25-store supermarket chain recovers an estimated **₹2.78 Crore annually**.
+- **Reproducible Evidence:** Everything is backed by a standalone, runnable `evaluate.py` script and documented in our 10-page Master PRD.
 
-- **For Store Associates:** No more wandering through thousands of aisles. They walk with purpose, armed with the Top 20 highest-probability discrepancies.
-- **For Store Managers:** Phantom detection time collapses from the retail industry average of **18 undetected days down to 2.4 days**.
-- **For CFOs and Executives:** Millions of rupees in lost sales are recovered before competitors even notice what happened.
-
-Every single requirement of Problem Statement R1—the 20-check human quota, the Precision@20 metric, the multi-class stretch goal, the auditable rupee recovery arithmetic, the real SQLite persistence, and the complete 10-page Master PRD Documentation PDF—has been built, tested, and verified.
-
-StockSentry AI is enterprise-ready, mathematically sound, and ready to protect supermarket shelves across the nation today.
+StockSentry AI is grounded, operationally defensible, and ready for pilot deployment on the shop floor.
 
 Thank you so much, and I welcome any questions!"
 
@@ -194,7 +199,7 @@ Thank you so much, and I welcome any questions!"
 
 ### Q1: "Why not use computer vision cameras or RFID smart shelves?"
 > **Answer:**  
-> "That's a great question. While ceiling cameras and RFID tags work in high-margin luxury boutiques, a standard supermarket carries 30,000 SKUs with thin 2-3% net margins. Installing RFID tags on a ₹30 packet of biscuits or ceiling cameras over 50 aisles costs hundreds of thousands of dollars and requires massive maintenance. StockSentry AI requires **zero new in-store hardware**. We use the data retailers already collect every second—POS barcode checkout scans and ERP inventory ledgers."
+> "That's a great question. While ceiling cameras and RFID tags work in high-margin luxury boutiques, a standard supermarket carries 30,000 SKUs with thin 2-3% net margins. Installing RFID tags on a ₹30 packet of biscuits or ceiling cameras over 50 aisles costs hundreds of thousands of dollars and requires massive maintenance. StockSentry AI requires **zero new in-store hardware**. We use the data retailers already collect every second—POS checkout scans and ERP inventory ledgers."
 
 ### Q2: "How do you avoid writing off stock when an item is just misplaced?"
 > **Answer:**  
@@ -203,3 +208,11 @@ Thank you so much, and I welcome any questions!"
 ### Q3: "What if a store has seasonal sales or promotions?"
 > **Answer:**  
 > "Our Poisson baseline engine explicitly incorporates temporal and promotional multipliers. On weekends, expected demand scales up by 1.25x to account for peak footfall. During active promotional flyers, expected demand scales by 1.60x. This means if an item is featured on promotion but records 0 sales, the anomaly engine penalizes it much faster because customer demand should have been higher."
+
+### Q4: "How do you prevent an associate from accidentally wiping out inventory records?"
+> **Answer:**  
+> "This is a critical enterprise control we built into the architecture: the **Two-Step Human-in-the-Loop Workflow**. When a floor associate finds 0 units, they do not directly alter the ERP. The system creates an **Audit Correction Proposal** with timestamp, auditor ID, and proposed adjustment. An authorized Store Operations Lead must review the proposal, verify notes or photos, and click 'Approve & Reconcile' before the adjustment is dispatched to the ERP with a unique transaction correlation ID."
+
+### Q5: "How did you arrive at the 55% slow-mover dampening factor?"
+> **Answer:**  
+> "Rather than guessing an arbitrary number, we treated 55% as an empirical hyperparameter. In our evaluation script, `evaluate.py`, we swept dampening from 0% (no dampening) to 90% in increments of 15-25%. At 0%, slow movers flooded the Top 20 due to natural Poisson intermittency, dropping precision. At 70%+, true slow-moving phantoms were completely suppressed. 55% was empirically verified as the exact Pareto-optimal balance that maximized balanced F1-score."

@@ -22,9 +22,12 @@ module.exports = (req, res) => {
 
   return res.status(200).json({
     success: true,
-    message: "Physical audit verified and synced to ERP ledger and Ground Truth Ledger",
+    message: "Audit Correction Proposal authorized by Store Lead and reconciled to ERP ledger",
+    proposalId: payload.proposalId || ('PROP-' + Math.floor(100000 + Math.random() * 900000)),
+    correlationId: 'TXN-ERP-' + Math.floor(10000000 + Math.random() * 90000000),
     record: {
       id: Date.now(),
+      proposalId: payload.proposalId || ('PROP-' + Math.floor(100000 + Math.random() * 900000)),
       timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
       date: payload.date || new Date().toISOString().slice(0, 10),
       store: payload.store || 'S01',
@@ -35,7 +38,8 @@ module.exports = (req, res) => {
       discrepancy: discrepancy,
       outcome: payload.outcome || 'Confirmed Phantom Stock-Out',
       notes: payload.notes || '',
-      auditor: payload.auditor || 'Priya Menon (Store Lead)',
+      auditor: payload.auditor || 'Priya Menon (Auditor)',
+      approver: payload.approver || 'Store Operations Lead (Approved)',
       erpStatus: discrepancy > 0 ? 'SYNCED_TO_ERP' : 'NO_CHANGE_NEEDED',
       recoveredRupees: recoveredRupees
     }

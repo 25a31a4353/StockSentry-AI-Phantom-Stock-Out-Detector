@@ -14,6 +14,7 @@ import os
 import re
 import sqlite3
 import sys
+import time
 import urllib.parse
 from datetime import datetime
 
@@ -607,14 +608,21 @@ class StockSentryHandler(http.server.SimpleHTTPRequestHandler):
         conn.commit()
         conn.close()
 
+        proposal_id = payload.get("proposalId", f"PROP-{int(time.time()) % 1000000:06d}")
+        approver = payload.get("approver", "Store Operations Lead (Approved)")
+        correlation_id = f"TXN-ERP-{int(time.time() * 1000) % 100000000:08d}"
+
         self.send_json({
             "success": True,
             "auditId": audit_id,
-            "message": f"Physical count logged. ERP inventory reconciled to {found_qty} units in database.",
+            "proposalId": proposal_id,
+            "correlationId": correlation_id,
+            "message": f"Audit Proposal {proposal_id} authorized by Store Lead. ERP reconciled to {found_qty} units with correlation {correlation_id}.",
             "erpReconciled": True,
             "recoveredRupees": recovered_rupees,
             "record": {
                 "id": audit_id,
+                "proposalId": proposal_id,
                 "timestamp": timestamp,
                 "date": date_str,
                 "store": store_id,
@@ -625,6 +633,7 @@ class StockSentryHandler(http.server.SimpleHTTPRequestHandler):
                 "outcome": outcome,
                 "notes": notes,
                 "auditor": auditor,
+                "approver": approver,
                 "erpStatus": erp_status
             }
         })

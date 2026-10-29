@@ -13,3 +13,4 @@ module.exports = (req, res) => {
     topShrinkageStores: ["S01 (Hyderabad)", "S04 (Chennai)", "S07 (Vijayawada)", "S12 (Kochi)"]
   });
 };
+

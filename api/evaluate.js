@@ -21,3 +21,4 @@ module.exports = (req, res) => {
     formulaExplanation: "Evaluates precision strictly on Top-20 ranking per store-day budget against ~3% hidden ground-truth labels."
   });
 };
+
