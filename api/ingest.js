@@ -15,3 +15,4 @@ module.exports = (req, res) => {
     message: `Successfully ingested ${records.length} records into StockSentry pipeline`
   });
 };
+
