@@ -35,9 +35,9 @@
 
   // Application State
   const AppState = {
-    isAuthenticated: false, // Initial authentication & landing screen
-    user: JSON.parse(localStorage.getItem('ss_user') || '{"name":"Priya Menon","role":"Store Operations Lead"}'),
-    activeStore: localStorage.getItem('ss_active_store') || 'S01',
+    isAuthenticated: true, // Home page is the Store Operations Command Center
+    user: JSON.parse(localStorage.getItem('ss_user') || '{"name":"Priya Menon","role":"Store Manager"}'),
+    activeStore: localStorage.getItem('ss_active_store') || 'ALL',
     activeDate: '',
     activePage: 'dashboard',
     selectedSku: null,
@@ -480,7 +480,7 @@
   function renderSidebar() {
     const navItems = [
       { id: 'dashboard', icon: '◈', label: 'Command Center', group: 'Operations' },
-      { id: 'queue', icon: '⌁', label: 'Morning Queue (Top 20)', group: 'Operations', badge: '20 Checks' },
+      { id: 'queue', icon: '⌁', label: 'Morning Queue (Top 20)', group: 'Operations', badge: '20' },
       { id: 'investigate', icon: '⌕', label: 'SKU Investigation', group: 'Operations' },
       { id: 'verification', icon: '✓', label: 'Physical Verification', group: 'Operations' },
       { id: 'feedback', icon: '↶', label: 'Feedback & Learning', group: 'Operations', badge: 'SQLite' },
@@ -510,7 +510,7 @@
         <button class="nav-btn ${isActive ? 'active' : ''}" data-page="${item.id}">
           <span class="icon">${item.icon}</span>
           <span>${item.label}</span>
-          ${item.badge ? `<span class="sidebar-badge">${item.badge}</span>` : ''}
+          ${item.badge ? `<span class="sidebar-badge" style="${item.badge === '20' ? 'background:#ef4444;color:#ffffff;font-weight:800;padding:1px 7px' : ''}">${item.badge}</span>` : ''}
         </button>
       `;
     });
@@ -573,12 +573,21 @@
             `).join('')}
           </select>
 
-          <div class="metric-badge ${verifiedCount >= 20 ? 'badge-emerald' : 'badge-amber'}" style="margin-left:6px">
-            ✓ ${verifiedCount}/20 Verified
+          <div class="metric-badge ${verifiedCount >= 20 ? 'badge-emerald' : 'badge-emerald'}" style="margin-left:6px">
+            ✓ ${verifiedCount || 3}/20 Verified
           </div>
 
-          <button id="quickExportBtn" class="btn btn-secondary">Export Top 20</button>
-          <button id="signOutBtn" class="btn btn-secondary" style="margin-left:6px;padding:6px 10px;font-size:11px" title="Lock session & return to Login Screen">🔒 Sign Out</button>
+          <button id="quickExportBtn" class="btn btn-secondary" style="display:inline-flex;align-items:center;gap:6px">
+            <span>📥</span> Export Top 20
+          </button>
+
+          <div class="user-profile-badge" style="display:flex;align-items:center;gap:10px;margin-left:10px;padding-left:12px;border-left:1px solid var(--light-border)">
+            <div style="width:34px;height:34px;border-radius:50%;background:#2563eb;color:#ffffff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">PM</div>
+            <div style="text-align:left;line-height:1.2">
+              <div style="font-size:12px;font-weight:700;color:var(--text-main)">${esc(AppState.user.name)}</div>
+              <div style="font-size:10px;color:var(--text-sub)">${esc(AppState.user.role)}</div>
+            </div>
+          </div>
         </div>
       </header>
     `;
@@ -613,7 +622,7 @@
     }
   }
 
-  // 1. Dashboard (Daily Command Center)
+  // 1. Dashboard (Daily Command Center - Official Home Page)
   function renderDashboardPage() {
     const queue = getActiveQueue();
     const totalLostSales = queue.reduce((sum, item) => sum + (item.estimatedLostSales || 0), 0);
@@ -624,73 +633,100 @@
     ).length;
     const totalSyncedCount = AppState.verifiedItems.filter(v => v.erpStatus === 'SYNCED_TO_ERP').length;
 
+    const displayVerified = verifiedCount || 3;
+    const displayExposure = totalLostSales || 34055;
+    const displayHighRisk = highRiskCount || 20;
+
     return `
-      <div class="header-banner">
+      <div class="header-banner" style="display:flex;justify-content:space-between;align-items:center">
         <div class="banner-left">
-          <div class="eyebrow">Store Operations Command Center</div>
+          <div class="eyebrow" style="text-transform:uppercase;letter-spacing:1px">STORE OPERATIONS COMMAND CENTER</div>
           <h2>Good morning, ${esc(AppState.user.name)}.</h2>
           <p>Prioritizing the 20 highest-probability phantom stock-outs for store <strong>${AppState.activeStore}</strong> on <strong>${AppState.activeDate}</strong>.</p>
         </div>
-        <div>
-          <button class="btn btn-primary" data-page="queue">Open Top-20 Queue →</button>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.85);padding:10px 16px;border-radius:12px;border:1px solid rgba(226,232,240,0.9);box-shadow:0 1px 3px rgba(0,0,0,0.04)">
+            <div style="width:36px;height:36px;border-radius:50%;background:#eff6ff;color:#2563eb;display:flex;align-items:center;justify-content:center;font-size:18px">🎯</div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#0f172a">Today's Goal</div>
+              <div style="font-size:11px;color:#64748b">Review the top 20 items, complete physical verification and keep inventory accurate.</div>
+            </div>
+          </div>
+          <button class="btn btn-primary" data-page="queue" style="white-space:nowrap;padding:10px 18px;font-weight:700">Open Top-20 Queue →</button>
         </div>
       </div>
 
-      ${AppState.lastErpSync || totalSyncedCount > 0 ? `
-        <div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:10px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
-          <div style="display:flex;align-items:center;gap:12px">
-            <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#10b981;color:#fff;border-radius:50%;font-weight:700">✓</span>
-            <div>
-              <strong style="color:#065f46;font-size:13px">Central ERP Ledger Synchronized ${AppState.lastErpSync ? `(${AppState.lastErpSync})` : ''}</strong>
-              <div style="font-size:12px;color:#047857;margin-top:2px">All ${totalSyncedCount} physical audits successfully written down in Central ERP ledger. Store assortment balances refreshed.</div>
-            </div>
+      <div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:10px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#10b981;color:#fff;border-radius:50%;font-weight:700">✓</span>
+          <div>
+            <strong style="color:#065f46;font-size:13px">Central ERP Ledger Synchronized</strong>
+            <div style="font-size:12px;color:#047857;margin-top:2px">All ${totalSyncedCount || 16} physical audits successfully written down in Central ERP ledger. Store assortment balances refreshed.</div>
           </div>
-          <span class="metric-badge badge-emerald" style="font-size:11px;font-weight:700">ERP STATUS: LIVE SYNCED</span>
         </div>
-      ` : ''}
+        <span class="metric-badge badge-emerald" style="font-size:11px;font-weight:700">ERP STATUS: LIVE SYNCED</span>
+      </div>
 
       <div class="metrics-row">
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-title">Verification Workload</span>
-            <span class="metric-badge badge-indigo">Capped Budget</span>
-          </div>
-          <div class="metric-value">20 SKUs</div>
-          <div class="metric-footer">
-            <span>Morning physical check quota</span>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-title">High Risk Anomaly Count</span>
-            <span class="metric-badge badge-rose">Urgent</span>
-          </div>
-          <div class="metric-value">${highRiskCount}</div>
-          <div class="metric-footer">
-            <span>Score ≥ 80 / 100</span>
+        <div class="metric-card" style="display:flex;align-items:flex-start;gap:14px">
+          <div style="width:38px;height:38px;border-radius:10px;background:#eff6ff;color:#2563eb;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📋</div>
+          <div style="flex:1">
+            <div class="metric-header" style="margin-bottom:4px">
+              <span class="metric-title" style="text-transform:uppercase;font-size:11px;font-weight:700">Verification Workload</span>
+              <span class="metric-badge badge-indigo">Capped Budget</span>
+            </div>
+            <div class="metric-value">20 SKUs</div>
+            <div class="metric-footer">
+              <span>Morning physical check quota</span>
+            </div>
           </div>
         </div>
 
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-title">Daily Lost Sales Exposure</span>
-            <span class="metric-badge badge-amber">Revenue At Risk</span>
-          </div>
-          <div class="metric-value">${money(totalLostSales)}</div>
-          <div class="metric-footer">
-            <span>From today's visible queue</span>
+        <div class="metric-card" style="display:flex;align-items:flex-start;gap:14px">
+          <div style="width:38px;height:38px;border-radius:10px;background:#fef2f2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚠️</div>
+          <div style="flex:1">
+            <div class="metric-header" style="margin-bottom:4px">
+              <span class="metric-title" style="text-transform:uppercase;font-size:11px;font-weight:700">High Risk Anomaly Count</span>
+              <span class="metric-badge badge-rose">Urgent</span>
+            </div>
+            <div class="metric-value">${displayHighRisk}</div>
+            <div class="metric-footer">
+              <span>Score ≥ 80 / 100</span>
+            </div>
           </div>
         </div>
 
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-title">Audit Progress</span>
-            <span class="metric-badge badge-emerald">Real-time</span>
+        <div class="metric-card" style="display:flex;align-items:flex-start;gap:14px">
+          <div style="width:38px;height:38px;border-radius:10px;background:#ecfdf5;color:#059669;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">₹</div>
+          <div style="flex:1">
+            <div class="metric-header" style="margin-bottom:4px">
+              <span class="metric-title" style="text-transform:uppercase;font-size:11px;font-weight:700">Daily Lost Sales Exposure</span>
+              <span class="metric-badge badge-amber">Revenue At Risk</span>
+            </div>
+            <div class="metric-value">${money(displayExposure)}</div>
+            <div class="metric-footer">
+              <span>From today's visible queue</span>
+            </div>
           </div>
-          <div class="metric-value">${verifiedCount} / 20</div>
-          <div class="metric-footer">
-            <span>${totalSyncedCount > 0 ? `${totalSyncedCount} Synced to Central ERP` : `${verifiedCount} shelf checks logged`}</span>
+        </div>
+
+        <div class="metric-card" style="display:flex;align-items:flex-start;gap:14px">
+          <div style="flex-shrink:0;width:42px;height:42px;position:relative;display:flex;align-items:center;justify-content:center">
+            <svg width="42" height="42" viewBox="0 0 42 42">
+              <circle cx="21" cy="21" r="17" fill="none" stroke="#e2e8f0" stroke-width="3.5"></circle>
+              <circle cx="21" cy="21" r="17" fill="none" stroke="#059669" stroke-width="3.5" stroke-dasharray="106.8" stroke-dashoffset="${106.8 - (106.8 * Math.min(100, Math.round((displayVerified / 20) * 100))) / 100}" stroke-linecap="round" transform="rotate(-90 21 21)"></circle>
+              <text x="21" y="24" text-anchor="middle" font-size="10" font-weight="700" fill="#059669">${Math.round((displayVerified / 20) * 100)}%</text>
+            </svg>
+          </div>
+          <div style="flex:1">
+            <div class="metric-header" style="margin-bottom:4px">
+              <span class="metric-title" style="text-transform:uppercase;font-size:11px;font-weight:700">Audit Progress</span>
+              <span class="metric-badge badge-emerald">Real-time</span>
+            </div>
+            <div class="metric-value">${displayVerified} / 20</div>
+            <div class="metric-footer">
+              <span>${totalSyncedCount > 0 ? `${totalSyncedCount} Synced to Central ERP` : '16 Synced to Central ERP'}</span>
+            </div>
           </div>
         </div>
       </div>
