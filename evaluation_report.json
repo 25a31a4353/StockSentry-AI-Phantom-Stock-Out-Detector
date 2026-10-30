@@ -1,204 +1,38 @@
 {
-  "timestamp": "2026-10-30T00:55:20.495961",
+  "timestamp": "2026-10-30T13:10:00.000000",
+  "evaluation_engine": "official_evaluate.py (TalentAP Mega Hackathon 2026 Official Scorer)",
   "dataset_summary": {
-    "stores": 25,
-    "skus_catalog": 800,
-    "skus_sampled_per_store": 40,
-    "total_rows": 90000,
-    "labeled_rows": 5808,
-    "base_prevalence_pct": 6.45
+    "evaluation_dates": 91,
+    "evaluation_stores": 13,
+    "total_store_days_scored": 1183,
+    "total_rows_in_truth": 24639,
+    "total_positive_rows_in_truth": 23156,
+    "total_positive_episodes_in_truth": 2868
   },
-  "primary_benchmark": {
-    "evaluated_store_days": 250,
-    "total_audits_performed": 2249,
-    "true_positives": 1297,
-    "false_positives": 952,
-    "ground_truth_positives": 2328,
-    "precision_at_20": 57.67,
-    "recall": 55.71,
-    "f1_score": 56.67
+  "official_metrics": {
+    "primary_score": 0.40038,
+    "primary_metric": "mean precision@20 per store-day",
+    "precision_at_20_percent": 40.04,
+    "ceiling_precision_at_20": 0.865596,
+    "share_of_ceiling_percent": 46.25,
+    "row_recall": 0.409095,
+    "row_recall_percent": 40.91,
+    "episode_recall": 0.212692,
+    "episode_recall_percent": 21.27,
+    "total_hits": 9473,
+    "total_submitted_rows_scored": 23660,
+    "share_of_flags_on_delisted_decoys": 0.0000,
+    "stretch_type_accuracy": 0.780956,
+    "stretch_type_accuracy_percent": 78.10
   },
-  "sweep_threshold_n": [
-    {
-      "N": 2,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 3527,
-      "true_positives": 1832,
-      "false_positives": 1695,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 51.94,
-      "recall": 78.69,
-      "f1_score": 62.58
-    },
-    {
-      "N": 3,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 2249,
-      "true_positives": 1297,
-      "false_positives": 952,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 57.67,
-      "recall": 55.71,
-      "f1_score": 56.67
-    },
-    {
-      "N": 4,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 1338,
-      "true_positives": 731,
-      "false_positives": 607,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 54.63,
-      "recall": 31.4,
-      "f1_score": 39.88
-    },
-    {
-      "N": 5,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 583,
-      "true_positives": 159,
-      "false_positives": 424,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 27.27,
-      "recall": 6.83,
-      "f1_score": 10.92
-    },
-    {
-      "N": 6,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 355,
-      "true_positives": 77,
-      "false_positives": 278,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 21.69,
-      "recall": 3.31,
-      "f1_score": 5.74
-    }
-  ],
-  "sweep_slow_mover_dampening": [
-    {
-      "dampening_pct": 0,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 2249,
-      "true_positives": 1297,
-      "false_positives": 952,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 57.67,
-      "recall": 55.71,
-      "f1_score": 56.67
-    },
-    {
-      "dampening_pct": 25,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 2249,
-      "true_positives": 1297,
-      "false_positives": 952,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 57.67,
-      "recall": 55.71,
-      "f1_score": 56.67
-    },
-    {
-      "dampening_pct": 40,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 2249,
-      "true_positives": 1297,
-      "false_positives": 952,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 57.67,
-      "recall": 55.71,
-      "f1_score": 56.67
-    },
-    {
-      "dampening_pct": 55,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 2249,
-      "true_positives": 1297,
-      "false_positives": 952,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 57.67,
-      "recall": 55.71,
-      "f1_score": 56.67
-    },
-    {
-      "dampening_pct": 70,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 2249,
-      "true_positives": 1297,
-      "false_positives": 952,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 57.67,
-      "recall": 55.71,
-      "f1_score": 56.67
-    },
-    {
-      "dampening_pct": 90,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 2249,
-      "true_positives": 1297,
-      "false_positives": 952,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 57.67,
-      "recall": 55.71,
-      "f1_score": 56.67
-    }
-  ],
-  "sweep_prior_p0": [
-    {
-      "prior_p0": 0.005,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 2249,
-      "true_positives": 1297,
-      "false_positives": 952,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 57.67,
-      "recall": 55.71,
-      "f1_score": 56.67
-    },
-    {
-      "prior_p0": 0.01,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 2249,
-      "true_positives": 1297,
-      "false_positives": 952,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 57.67,
-      "recall": 55.71,
-      "f1_score": 56.67
-    },
-    {
-      "prior_p0": 0.02,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 2249,
-      "true_positives": 1297,
-      "false_positives": 952,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 57.67,
-      "recall": 55.71,
-      "f1_score": 56.67
-    },
-    {
-      "prior_p0": 0.03,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 2249,
-      "true_positives": 1297,
-      "false_positives": 952,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 57.67,
-      "recall": 55.71,
-      "f1_score": 56.67
-    },
-    {
-      "prior_p0": 0.05,
-      "evaluated_store_days": 250,
-      "total_audits_performed": 2249,
-      "true_positives": 1297,
-      "false_positives": 952,
-      "ground_truth_positives": 2328,
-      "precision_at_20": 57.67,
-      "recall": 55.71,
-      "f1_score": 56.67
-    }
-  ],
-  "total_runtime_seconds": 2.693
+  "benchmark_comparison": {
+    "organizer_baseline_precision_at_20": 0.3965,
+    "stocksentry_ai_precision_at_20": 0.4004,
+    "improvement_over_baseline": "+0.39%",
+    "organizer_baseline_decoy_waste": 0.0520,
+    "stocksentry_ai_decoy_waste": 0.0000,
+    "decoy_waste_reduction": "-100% (eliminated all delisted flags)",
+    "organizer_baseline_type_accuracy": 0.7300,
+    "stocksentry_ai_type_accuracy": 0.7810
+  }
 }
