@@ -1654,22 +1654,6 @@
         </div>
       </div>
 
-      <!-- MASTER PROJECT DOCUMENTATION & PRD PDF FEATURED BANNER -->
-      <div class="panel-card" style="border: 2px solid var(--accent-indigo); background: linear-gradient(135deg, rgba(79,70,229,0.06), rgba(124,58,237,0.06)); margin-bottom: 20px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px">
-          <div style="max-width:760px">
-            <span class="metric-badge badge-indigo">Publication-Grade Document · 10 Chapters</span>
-            <h3 style="margin-top:8px;font-size:17px;color:var(--text-main)">StockSentry AI — Master Project Documentation & PRD (PDF)</h3>
-            <p style="font-size:13px;color:var(--text-sub);margin-top:6px;line-height:1.6">
-              Complete pin-to-pin specifications: Problem Statement R1, PRD Requirements, System Architecture, Bayesian Poisson Math, Multi-Class Signal Shapes, Rupee Recovery Arithmetic, 16-Module Tour, Store Data Integration Hub, and Step-by-Step Operator Manual.
-            </p>
-          </div>
-          <a href="/StockSentry_AI_Master_Documentation_and_PRD.pdf" target="_blank" download class="btn btn-primary" style="display:inline-flex;align-items:center;gap:8px;padding:12px 22px;font-size:13px;text-decoration:none;font-weight:700">
-            📄 Download Master PRD & Technical PDF
-          </a>
-        </div>
-      </div>
-
       <div class="content-grid-3">
         <div class="panel-card">
           <h3>Daily Top-20 Queue CSV</h3>
@@ -1778,27 +1762,6 @@
         </div>
       </div>
 
-      <!-- MASTER PROJECT DOCUMENTATION & PRD PDF FEATURED BANNER -->
-      <div class="panel-card" style="border: 2px solid var(--accent-indigo); background: linear-gradient(135deg, rgba(79,70,229,0.06), rgba(124,58,237,0.06)); margin-bottom: 20px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px">
-          <div>
-            <span class="metric-badge badge-indigo">Official Project Deliverable</span>
-            <h3 style="margin-top:6px;font-size:16px;color:var(--text-main)">Master Project Documentation & PRD (10-Page Technical Manual)</h3>
-            <p style="font-size:13px;color:var(--text-sub);margin-top:4px">
-              Full pin-to-pin documentation including PRD specifications, mathematical derivations, architecture diagrams, and operator playbooks.
-            </p>
-          </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <a href="/StockSentry_AI_Master_Documentation_and_PRD.pdf" target="_blank" download class="btn btn-primary" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;text-decoration:none;font-size:13px;font-weight:700">
-              📄 Download Master PDF
-            </a>
-            <a href="/StockSentry_AI_Live_Demo_Walkthrough.mp4" target="_blank" class="btn btn-secondary" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;text-decoration:none;font-size:13px;font-weight:700">
-              🎥 Watch Demo Video (3m)
-            </a>
-          </div>
-        </div>
-      </div>
-
       <div class="content-grid-2">
         <div class="panel-card">
           <h3>The R1 Problem: What is a Phantom Stock-Out?</h3>
@@ -1862,8 +1825,6 @@
           </div>
 
           <div style="padding:6px 12px;background:#f8fafc;border-top:1px solid var(--light-border);display:flex;gap:6px;overflow-x:auto;white-space:nowrap">
-            <button class="copilot-chip" data-quick-ask="Show me the live demo video walkthrough">🎥 Demo Video</button>
-            <button class="copilot-chip" data-quick-ask="Where can I download the Master PRD and Technical Documentation PDF?">📄 Project PRD & PDF</button>
             <button class="copilot-chip" data-quick-ask="Explain step by step how to use this project">🚀 How to Use</button>
             <button class="copilot-chip" data-quick-ask="Which store data integration option should I choose?">🔌 Integrate Store Data</button>
             <button class="copilot-chip" data-quick-ask="Why is the #1 priority SKU flagged?">❓ Why #1 SKU?</button>
