@@ -1,226 +1,274 @@
-# 🛒 StockSentry AI — Phantom Stock-Out Detector & Autonomous Retail Operations Console
+# StockSentry AI — Phantom Stock-Out Detector
+**TalentAP Mega Hackathon 2026 · Problem R1 (Retail)**
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Architecture: Zero-Hardware CapEx](https://img.shields.io/badge/Architecture-100%25%20Software%20Zero--CapEx-emerald.svg)]()
-[![Model: Bayesian Latent-State](https://img.shields.io/badge/Algorithm-Bayesian%20Poisson--Gamma-purple.svg)]()
-[![Precision@20](https://img.shields.io/badge/Precision%4020-93.8%25%20(Benchmark)-success.svg)]()
-[![Database: Persistent SQLite](https://img.shields.io/badge/Persistence-SQLite3%20Two--Way%20Sync-orange.svg)]()
+[![Metric: Mean Precision@20](https://img.shields.io/badge/Official%20Dev%20Precision%4020-40.55%25-success.svg)]()
+[![Baseline Beat](https://img.shields.io/badge/Organizer%20Baseline-39.65%25%20(%2B0.90%25)-brightgreen.svg)]()
+[![Leakage Audit: Verified](https://img.shields.io/badge/Point--in--Time%20Audit-Zero%20Leakage-blue.svg)]()
+[![Tests: 17/17 Passed](https://img.shields.io/badge/pytest-17%20passed%20(100%25)-emerald.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)]()
 
-> **An enterprise-grade retail intelligence platform that detects invisible phantom inventory mismatches, enforces the daily Top-20 physical audit quota, automates ERP reconciliation, and recovers over ₹2.78 Crore in lost retail sales across multi-store chains.**
+---
+
+## What It Does
+**StockSentry AI** is a point-in-time retail inventory intelligence system and store operations console designed to eliminate invisible phantom stock-outs without requiring expensive hardware cameras or RFID tags.
+
+In grocery and supermarket retail, an enterprise ERP system often reports positive on-hand inventory (e.g., 12 units of basmati rice), while the sales floor gondola is completely bare due to theft shrinkage, misplaced inventory, or unrecorded damage. Because inventory records show stock, automated replenishment systems stay asleep, zero sales occur, and revenue drains silently.
+
+StockSentry AI ingests daily Point-of-Sale (POS) transactions and on-hand inventory balances overnight, detects anomalous velocity drop-offs while strictly following point-in-time constraints, ranks the **Top-20 highest-probability shelf discrepancies per store-day**, generates plain-language operational explanations, and provides store associates with a fast, interactive physical verification walk that automatically reconciles inventory discrepancies.
 
 ---
 
-## 📑 Table of Contents
-1. [The Phantom Stock Crisis & The R1 Challenge](#-the-phantom-stock-crisis--the-r1-challenge)
-2. [Novelty & Competitive Differentiation Matrix](#-novelty--competitive-differentiation-matrix)
-3. [Enterprise Multi-Tier Architecture](#-enterprise-multi-tier-architecture)
-4. [5-Phase Operational Workflow](#-5-phase-operational-workflow)
-5. [The 16 Interactive Modules Tour](#-the-16-interactive-modules-tour)
-6. [Mathematical Detection Engine](#-mathematical-detection-engine)
-7. [Official Benchmark Performance (`evaluate.py`)](#-official-benchmark-performance-evaluatepy)
-8. [Auditable Rupee Recovery Model](#-auditable-rupee-recovery-model)
-9. [3-Minute Live Demo Video & Presentation Speech](#-3-minute-live-demo-video--presentation-speech)
-10. [Local Quickstart & Execution Guide](#-local-quickstart--execution-guide)
+## Problem Statement
+- **Problem ID**: R1 — The Phantom Stock-Out Detector
+- **Assortment Scope**: 25 retail stores, 800 SKUs, 548 days (7,970,112 store-SKU-day panel records).
+- **Physical Labor Budget**: Store associates have a strict operational budget capped at **exactly 20 physical checks per store-day**.
+- **Scoring Authority**: Untouched official competition evaluator (`evaluate.py`).
+- **Primary Metric**: **Mean Precision@20 per Store-Day**
+  $$\text{Precision@20} = \frac{\text{Hits on Genuine Shelf Problems (phantom or misplaced)}}{20}$$
+- **Official Positive Targets**: `phantom`, `misplaced`.
+- **Negative Decoy**: `delisted` (SKUs discontinued chain-wide; flagging these counts as wasted checks).
 
 ---
 
-## 🚨 The Phantom Stock Crisis & The R1 Challenge
+## Solution
+StockSentry AI employs a **Point-in-Time Demand–Inventory Anomaly Ranker**:
+1. **Zero-Sales Persistence**: Quantifies consecutive days of zero sales ($z_{ist}$) while system on-hand inventory persists above zero ($I_{ist} > 0$).
+2. **Poisson Intermittent Demand Rate**: Estimates point-in-time expected sales velocity ($\lambda_{ist}$) over a trailing 30-day window using only data up to date $D-1$:
+   $$P(X=0 \mid \lambda) = e^{-\lambda \cdot z}$$
+3. **Chain-Wide Delisted Decoy Suppression**: Dynamically identifies chain-wide sales and inventory cessation ($S_{\text{chain},t} = 0, I_{\text{chain},t} = 0$), pruning false positive delisted decoys and preserving precious audit slots for genuine phantoms.
+4. **Calibrated Ranking & Explanation**: Computes composite anomaly suspicion scores:
+   $$S_{ist} = \ln(1 + z_{ist}) \cdot \min(I_{ist}, 50)^{0.25} \cdot (1 - e^{-\lambda_{ist} \cdot z_{ist}}) \cdot \text{PromoMultiplier}$$
+   Picks top 20 SKUs per store-day, assigns calibrated confidence scores $[0.50, 0.99]$, and pairs each with an auditable explanation.
 
-In modern retail, a **Phantom Stock-Out** (or Ghost Inventory) occurs when an enterprise ERP system records positive on-hand inventory (e.g., 8 units) for an item, but the physical shelf is completely empty due to **shoplifting theft, shelf misplacement, receiving discrepancy, or damaged write-off delays**.
-
-### The Devastating Downstream Impact:
-- **Asleep Replenishment Engines:** Because the computer believes stock is healthy, automated re-ordering algorithms never trigger a replenishment Purchase Order.
-- **Invisible Lost Revenue:** Daily customer checkouts fall to zero for weeks or months. Frustrated shoppers switch to competing supermarkets.
-- **$112 Billion Global Shrinkage:** The National Retail Federation estimates retail shrinkage and phantom inventory drain over **$112 Billion annually**.
-- **The Store Associate Quota Dilemma:** Supermarkets stock between 15,000 and 40,000 SKUs. A store associate cannot audit every aisle; Problem Statement R1 establishes a hard real-world operational constraint: **Store associates have a daily labor budget of exactly 20 physical checks per store-day.**
-
----
-
-## 💎 Novelty & Competitive Differentiation Matrix
-
-StockSentry AI solves the fundamental flaws of legacy retail practices by delivering a mathematically sound, 100% software-driven solution:
-
-| Feature / Capability | Traditional Cycle Counts | Hardware Systems (RFID / Cameras) | Generic ERP Rule Alerts | **StockSentry AI (Our Solution)** |
-|---|---|---|---|---|
-| **Capital Expenditure (CapEx)** | High labor payroll cost | **Exorbitant ($50K–$100K/store)** for cameras & smart shelves | Zero additional hardware | **Zero Hardware ($0 CapEx)** — Uses existing POS & ERP data |
-| **Detection Lag** | **15 to 30 Days** (periodic quarterly or monthly sweeps) | Real-time (subject to blind spots & occlusion) | 3 to 7 days (crude threshold rules) | **< 24 Hours (Overnight batch Bayesian inference)** |
-| **Daily Alert Volume** | No prioritization (random or manual spot checks) | Generates thousands of continuous micro-events | **Unfiltered firehose (200–500 alerts/day)** | **Exactly Top-20 Ranked Checks** (Strict R1 quota compliance) |
-| **Intermittent Demand (Slow-Movers)** | Ignored; staff wastes hours counting slow goods | Cannot distinguish slow-movers from theft | **Massive false alarm rate (up to 80% false positives)** | **55% Slow-Mover Penalty Filter** ($\lambda < 0.4$) prevents noise |
-| **ERP Closed-Loop Restocking** | Manual paper entry days later | Often read-only monitoring dashboards | Alerts require manual supervisory intervention | **Real-Time Two-Way SQLite Auto-Write-Down** waking replenishment POs |
-| **Multi-Class Anomaly Separation** | None; physical count only | Visual bounding boxes only | Binary (zero sales vs. positive sales) | **Classifies: Phantom Theft vs. Misplacement vs. Delisted SKU** |
-| **Synthetic Simulation Studio** | None | None | None | **Built-in Studio simulating 7 retail shrinkage failure modes** |
-| **Audit Compliance & Learning** | Paper clipboards with zero ML feedback | Sensor calibration only | Static alert logs | **Bayesian weight self-calibration via verified physical audits** |
-
----
-
-## 🏛️ Enterprise Multi-Tier Architecture
-
-StockSentry AI is engineered as an enterprise-grade multi-tier architecture designed for sub-millisecond execution, high fault tolerance, and zero-configuration edge deployment:
-
-![StockSentry AI Enterprise Architecture](assets/stocksentry_architecture_diagram.jpg)
-
-### Tier 1: Multi-Source Data Ingestion Hub
-- **Direct Cloud ERP API Connector:** Ingests live inventory snapshots from SAP S/4HANA, Oracle Retail, Microsoft Dynamics, and Blue Yonder via secure REST endpoints.
-- **POS CSV Batch Ingestion:** Automated 03:00 AM SFTP sync processing daily barcode register scans (`store_id`, `sku_id`, `units_sold`, `promo_flag`).
-- **Handheld RF/Barcode Scanner Integration:** Real-time bi-directional telemetry with Zebra TC52 and Honeywell CT40 Android mobile computers running the StockSentry Field PWA.
-- **Built-in Synthetic Retail Studio:** Generates paired ground-truth realities, injecting 7 real-world failure modes and hard negative non-phantom controls.
-
-### Tier 2: Statistical Inference & Multi-Class Machine Learning Core
-- **Bayesian Latent-State Anomaly Estimator:** Calculates the posterior probability $P(\text{Phantom} \mid X_{t-N \dots t} = 0, \lambda)$ using Poisson customer arrivals.
-- **55% Intermittent Slow-Mover Filter:** Dampens suspicion scores for slow SKUs ($\lambda < 0.4$ units/day) to safeguard the 20-audit budget.
-- **Signal Geometry Multi-Class Classifier:** Separates sudden cliff drops (Shrinkage Theft) from erratic micro-sales (Shelf Misplacement) and structural zeros (Delisted SKUs).
-- **Sub-5ms Competition Benchmark Harness:** Executes full `evaluate.py` logic across 750 store-days in $<5\text{ ms}$, achieving **93.8% Precision@20**.
-
-### Tier 3: Operations Console & Natural Language Copilot
-- **Dual-Theme High-Usability UI:** Executive Dark-Slate operations panel on the left, high-contrast Clean Light Canvas on the right for all tables, charts, and verification workflows.
-- **20-Bar Dynamic Score Distribution:** Visualizes critical-risk clustering across the catalog.
-- **Dynamic AI Copilot (`StockSentryRetailAgent`):** Conversational edge intelligence answering queries on root causes, scoring math, and ERP connectivity without requiring cloud API keys.
-
-### Tier 4: Enterprise Persistence & Two-Way ERP Synchronization
-- **ACID SQLite Database (`stocksentry.db`):** Maintains persistent audit trails (`physical_audits`), store masters, and inventory ledgers (`erp_ledger`).
-- **Instant ERP Write-Down Hook:** When an associate logs 0 units, on-hand inventory is immediately set to 0, waking up automated vendor purchase orders within milliseconds.
-
----
-
-## 🔄 5-Phase Operational Workflow
-
-![StockSentry AI 5-Phase Workflow](assets/stocksentry_workflow_diagram.jpg)
-
-1. **Overnight Ingestion & Bayesian Anomaly Detection (03:00 AM):** Overnight cron jobs ingest POS transactions and ERP balances, running Bayesian Poisson anomaly detection across 30,000 SKUs in seconds.
-2. **Dynamic Top-20 Prioritization (08:00 AM):** Ranks the Top 20 highest-risk discrepancies per store, pairing each with an auditable plain-English reason and dynamic confidence score.
-3. **Store Associate Morning Shelf Walk (08:30 AM):** Associate walks the sales floor with an Android PDA, following an optimized aisle route to physically verify the 20 flagged locations.
-4. **Instant Ground-Truth Capture & SQLite ERP Sync (09:00 AM):** Physical counts are entered directly into the verification modal. Zero-unit findings trigger an immediate ERP write-down, instantly generating restock purchase orders.
-5. **Continuous Calibration & Financial ROI Realization:** Physical audit results flow into the machine learning engine, continuously updating prior distributions while the Rupee Recovery console records realized revenue gains.
-
----
-
-## 🖥️ The 16 Interactive Modules Tour
-
-| Module | Purpose & Features |
-|---|---|
-| **1. Daily Command Center** | Bird's-eye operational status across 25 stores, phantom alert rates, and 20-bar priority score distribution. |
-| **2. Morning Queue (Top 20)** | Exactly 20 prioritized physical checks with dynamic confidence scores (96.4 down to 54.2), plain-English explanations, and CSV export. |
-| **3. SKU Deep Investigation** | Dual-axis velocity charts, expected Poisson customer demand curves, day-of-week multipliers, and multi-class anomaly breakdown. |
-| **4. Physical Verification Modal** | Guided count stepper, simulated barcode scanner, outcome selector, field notes, and one-click ERP submission. |
-| **5. Feedback & History** | Comprehensive audit log with full confusion matrix, associate compliance metrics, and model calibration tracking. |
-| **6. Store Analysis** | Deep-dive location health, format, square footage, category risk distribution, and historical shrinkage benchmarks. |
-| **7. 25-Store Network Matrix** | Chain-wide comparison table and interactive geographic bubble map tracking stores in Mumbai, Delhi, Bangalore, and tier-2 hubs. |
-| **8. Longitudinal Anomaly Trends** | Tracks historical recurring phantom patterns and Mean Time to Detect (MTTD), dropping from 18 days to 2.4 days. |
-| **9. Rupee Recovery (ROI) Console** | CFO-auditable financial formula calculating recovered rupees per verified item with real-time gross margin sensitivity sliders. |
-| **10. Official `evaluate.py` Engine** | Live competition evaluation harness benchmarking 750 store-days in $<5\text{ ms}$, reporting Precision@20 and hidden recall. |
-| **11. Synthetic Retail Studio** | Dual-reality generator injecting 7 real-world failure modes and hard negative non-phantom controls. |
-| **12. Store Data Integration Hub** | Visual multi-option connector guide with direct file dropzone for SAP ERP, POS CSV, Zebra handhelds, and synthetic data. |
-| **13. Reports & CSV Export** | Dynamic one-click CSV generation for Top-20 queues, historical audit logs, and chain-wide financial summaries. |
-| **14. Multi-Provider Settings** | Configure OpenAI (`gpt-4o`), Hugging Face (`Llama-3-8B`), or zero-config Edge Neural AI providers. |
-| **15. Master PRD & Documentation** | Embedded PDF viewer and direct download link for the comprehensive 13-page technical blueprint. |
-| **16. AI Copilot Dock** | Persistent natural language assistant explaining SKU diagnostics, mathematical formulations, and ERP workflows. |
-
----
-
-## 📐 Mathematical Detection Engine
-
-### 1. The Poisson Customer Checkout Process
-Daily customer demand $X_t$ for SKU $i$ follows a Poisson distribution with expected rate $\lambda_i$:
-$$P(X_t = k \mid \lambda_i) = \frac{\lambda_i^k e^{-\lambda_i}}{k!}$$
-
-The probability of witnessing zero sales on a single day given that stock is physically available is:
-$$P(X_t = 0 \mid \text{Available}, \lambda_i) = e^{-\lambda_i}$$
-
-### 2. Joint Probability of an $N$-Day Zero Streak
-If a product normally sells $\lambda = 1.8$ units/day, the joint probability of observing 8 consecutive days of zero sales under healthy availability is:
-$$P(X_{t-7 \dots t} = 0 \mid \text{Available}, \lambda) = \prod_{k=0}^7 e^{-\lambda} = e^{-8 \times 1.8} = e^{-14.4} \approx 5.57 \times 10^{-7}$$
-*(Less than 1 in 1.7 million chance, providing overwhelming evidence of a physical stock-out).*
-
-### 3. Bayesian Posterior Updating
-Using Bayes' Theorem with an empirical prior base rate $P(\text{Phantom}) \approx 0.03$:
-$$P(\text{Phantom} \mid X = 0) = \frac{P(X = 0 \mid \text{Phantom}) \cdot P(\text{Phantom})}{P(X = 0 \mid \text{Phantom}) \cdot P(\text{Phantom}) + P(X = 0 \mid \text{Available}) \cdot P(\text{Available})}$$
-
-### 4. The 55% Intermittent Slow-Mover Penalty Filter
-To protect the associate's 20-audit quota from naturally intermittent items:
-$$\text{Score}_{\text{final}} = \begin{cases} \text{Score} \times 0.45 & \text{if } \lambda_i < 0.4 \text{ units/day} \\ \text{Score} & \text{otherwise} \end{cases}$$
-
----
-
-## 📊 Official Benchmark Performance (`evaluate.py`)
-
-StockSentry AI was benchmarked against the official competition evaluation protocol across 750 synthetic store-days:
-
-| Evaluation Metric | Legacy 3-Day Rule | Static Rolling Average | **StockSentry AI** |
+### Official Benchmark Performance (`evaluate.py` on 1,183 Dev Store-Days)
+| Metric | Organizer Baseline | StockSentry AI | Delta |
 |---|---|---|---|
-| **Precision@20** | 34.2% | 51.6% | **93.8%** |
-| **False Discovery Rate (FDR)** | 65.8% | 48.4% | **6.2%** |
-| **Execution Latency (750 Store-Days)** | 120 ms | 45 ms | **< 5 ms** |
-| **Slow-Mover False Positives** | High (swamps queue) | Moderate | **Near Zero (Filtered)** |
-| **Two-Way ERP Sync** | ❌ None | ❌ None | **✅ Instant SQLite Trigger** |
+| **Mean Precision@20** | **39.6492%** | **40.5495%** | **+0.9003 pp (+2.27% rel)** |
+| **Verified True Positive Hits** | 9,381 hits | **9,594 hits** | **+213 verified hits** |
+| **Theoretical Ceiling** | 86.56% | 86.56% | — |
+| **Share of Ceiling** | 45.81% | **46.85%** | +1.04 pp |
+| **Row Recall** | 40.51% | **41.43%** | +0.92 pp |
+| **Episode Recall** | 20.36% | **20.96%** | +0.60 pp |
+| **Delisted Decoy Waste** | 5.20% | **2.26%** | **-2.94 pp (56.5% reduction)** |
+| **Stretch Type Accuracy** | — | **76.15%** | (Distinguishing phantom vs misplaced) |
 
 ---
 
-## 💰 Auditable Rupee Recovery Model
+## Operational Lifecycle
+StockSentry AI models the full operational cycle from overnight signal detection to ledger write-down:
 
-The financial ROI console uses transparent, auditable unit economics:
-$$\text{Recovered Revenue (₹)} = \sum_{k \in \text{Verified Top 20}} \Big[ \mathbb{E}[\text{Daily Demand}_k] \times \text{Unit Price}_k \times \Delta t_{\text{leakage}} \times \eta_{\text{margin}} \Big]$$
+```mermaid
+flowchart LR
+    A["1. Detect"] --> B["2. Rank"]
+    B --> C["3. Explain"]
+    C --> D["4. Verify"]
+    D --> E["5. Record"]
+    E --> F["6. Learn"]
+    F --> G["7. Measure"]
+    G --> H["8. Report"]
+```
 
-- Across a typical 25-store supermarket chain, StockSentry AI recovers **₹2,78,40,000 (₹2.78 Crore)** annually in previously invisible phantom leakage.
+1. **Detect (Overnight Ingestion)**: Ingests POS transactions and inventory balances; runs point-in-time velocity checks.
+2. **Rank (Morning Top-20 Queue)**: Selects exactly 20 prioritized SKUs per store within the associate labor quota.
+3. **Explain (Auditable Insights)**: Formulates plain-English diagnostics (e.g., *"Zero sales for 14 days while system records 18 on hand; expected velocity is 2.4 units/day"*).
+4. **Verify (Physical Shelf Walk)**: Store associates audit the physical aisle, entering actual count found. Verified SKUs fade out immediately from active lists.
+5. **Record (Audit Ground Truth)**: Persists verification outcomes, discrepancies, timestamps, and auditor IDs to SQLite storage.
+6. **Learn (Feedback & Continuous Learning)**: Updates Bayesian priors and shrinkage histories across the store network.
+7. **Measure (Metric Engine)**: Recomputes live precision, audit completion rates, and recovered revenue in real time.
+8. **Report (Export & ERP Sync)**: Generates verified audit trail CSVs and syncs inventory write-downs to central ERP.
 
 ---
 
-## 🎬 3-Minute Live Demo Video & Presentation Speech
+## Key Modules Explained
 
-### 🎥 Live Demo Video Walkthrough:
-A 3-minute high-definition walkthrough with **Indian English voiceover narration** and **burned-in subtitles** demonstrating the entire project from end to end:
-- **Video File:** [`StockSentry_AI_Live_Demo_Walkthrough.mp4`](StockSentry_AI_Live_Demo_Walkthrough.mp4)
-- **Subtitles:** [`StockSentry_AI_Live_Demo_Subtitles.vtt`](StockSentry_AI_Live_Demo_Subtitles.vtt) | [`StockSentry_AI_Live_Demo_Subtitles.srt`](StockSentry_AI_Live_Demo_Subtitles.srt)
-- **Voiceover Artist:** Indian English Neural (`en-IN-PrabhatNeural`)
-- **Key Scenes:** Problem Hook &rarr; 20-Audit Quota &rarr; Command Center &rarr; Morning Queue &rarr; Deep Diagnostic &rarr; Shelf Walk &rarr; SQLite Write-Down &rarr; Rupee ROI &rarr; Data Hub &rarr; AI Copilot.
+### 1. Morning Verification Queue (`Morning Queue (Top 20)`)
+Displays today's 20 highest-priority checks for the selected store. Once verified, items immediately fade out (`.row-verified-faded`) and cross-update physical verification views.
 
-### 🎙️ 10-Minute Presentation Speech Guide:
-Looking to present StockSentry AI to hackathon judges or retail executives? Refer to our complete step-by-step presentation script:
-- **Presentation Guide:** [`TECHNICAL_SPEECH_GUIDE.md`](TECHNICAL_SPEECH_GUIDE.md)
-- Includes vocal pacing cues, stage directions, competitive novelty highlights, and quick Q&A defense answers.
+### 2. Physical Verification (`Physical Verification`)
+Interactive shelf verification workflow. Captures physical counts found on shelf, identifies whether items were stolen phantoms or misplaced behind other stock, and marks tasks as resolved.
 
-### 📄 Master PRD & Technical Documentation PDF:
-- **Complete Blueprint:** [`StockSentry_AI_Master_Documentation_and_PRD.pdf`](StockSentry_AI_Master_Documentation_and_PRD.pdf) (13 comprehensive pages with visual architecture and workflow diagrams).
+### 3. Audit Ground Truth History (`Feedback & Learning`)
+ACID persistence log tracking all past audits: timestamp, store, SKU, predicted vs observed state, auditor identity, and ERP sync status.
 
----
+### 4. Upload / Sync to Central ERP
+Simulates real-time two-way enterprise ERP ledger synchronization. Updates audit status from `PENDING_ERP` to `SYNCED_TO_ERP` and adjusts on-hand balances.
+> *Note on ERP Integration: StockSentry AI includes a controlled software simulation of enterprise ERP API write-downs (SAP S/4HANA / Oracle Retail / Microsoft Dynamics connector specification) to demonstrate closed-loop replenishment without requiring proprietary live credentials during evaluation.*
 
-## 🏃 Local Quickstart & Execution Guide
+### 5. Audit Trail CSV
+One-click export (`StockSentry_Audit_GroundTruth_Ledger_YYYY-MM-DD.csv`) containing the complete historical record of physical counts, discrepancy amounts, and ERP synchronization timestamps.
 
-### Prerequisites:
-- Python 3.10+
-- Modern Web Browser (Chrome, Edge, Firefox, Safari)
+### 6. Store Data Integration (POS CSV / Excel Batch Drop)
+Allows operators to upload external single files, multi-file batches, or entire POS folders. Supports `.csv`, `.tsv`, `.txt`, and `.xlsx`. Automatically maps columns (`date`, `store_id`, `sku_id`, `units_sold`, `on_hand_eod`), links catalog master records, updates live views, and features a one-click Reset to official data.
 
-### 1. Clone the Repository:
-```bash
-git clone https://github.com/Shanmukheswar97/StockSentry-AI-Phantom-Stock-Out-Detector.git
-cd StockSentry-AI-Phantom-Stock-Out-Detector
-```
-
-### 2. Install Python Dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Launch the Backend API & Server:
-```bash
-python server.py
-```
-*The server starts on `http://localhost:8080` with persistent SQLite storage at `stocksentry.db`.*
-
-### 4. Run the Competition Benchmark:
-```bash
-python evaluate.py
-```
-
-### 5. Recompile Master PDF:
-```bash
-python generate_documentation_pdf.py
-```
+### 7. Evaluation & Metric Engine
+Embedded evaluation harness executing the official competition scoring logic. Tracks running Precision@20, false-alarm reduction, and audit progress dynamically.
 
 ---
 
-## 📜 License
-Distributed under the MIT License. See `LICENSE` for more information.
+## Project Structure
+Organized strictly in compliance with the **TalentAP Mega Hackathon Participant Coding Guidelines v1.1**:
+
+```
+StockSentryAI/
+├── README.md               # Official submission documentation (Rule 12)
+├── .gitignore              # Excludes data, models, .venv, node_modules, .db (Rule 2)
+├── LICENSE                 # MIT Open-Source License
+├── submission/             # Retail competition prediction file
+│   └── R1_predictions.csv  # Final 14,000-row test submission (25 stores × 28 dates)
+└── FULL_CODE/              # ALL application code, pipeline, and tests (Rule 2)
+    ├── main.py             # Canonical submission & pipeline entry point
+    ├── requirements.txt    # Pinned Python package dependencies
+    ├── .env.example        # Dummy environment variables template (Rule 3)
+    ├── web/                # Operations console web application
+    │   ├── index.html      # Responsive application shell
+    │   ├── app.js          # Operations console UI controller & verification engine
+    │   ├── ai-engine.js    # Client-side statistical scoring & anomaly diagnostics
+    │   ├── data.js         # Offline store catalog & initial mock state
+    │   ├── styles.css      # Custom styling, dark/light themes, modal overlays
+    │   ├── package.json    # Frontend package manifest
+    │   └── assets/         # UI images, diagrams, and vector assets
+    ├── api/                # REST backend server
+    │   ├── server.py       # Python http.server REST API & SQLite service
+    │   ├── vercel.json     # Serverless cloud deployment configuration
+    │   └── api/            # Serverless endpoint handlers (/api/verify, /api/status, etc.)
+    ├── pipeline/           # Detection engine & submission generator
+    │   ├── main.py         # End-to-end pipeline runner
+    │   ├── config.py       # Paths, dates, and hyperparameter configuration
+    │   ├── data_loader.py  # Fast pyarrow parquet & CSV data loaders
+    │   ├── features.py     # Trailing streak, Poisson rate & dynamic delisted filters
+    │   ├── predict.py      # Top-20 ranking & reason generator
+    │   ├── validation.py   # Leakage verification protocol
+    │   ├── submission_validator.py # Schema & boundary validator
+    │   └── evaluate.py     # Official untouched competition scorer
+    ├── db/                 # Database schema & migrations
+    │   └── schema.sql      # SQLite DDL & initial audit ground-truth seeds
+    ├── tests/              # Test suite (17 passed)
+    │   ├── test_pipeline.py       # Algorithmic invariants & monotonicity tests
+    │   ├── test_leakage_audit.py  # Strict point-in-time cutoff tests (4 dates)
+    │   └── test_functional_e2e.py # Operational lifecycle, CSV upload & ERP sync tests
+    ├── docs/               # Technical specifications & reproducibility logs
+    │   ├── MODEL_CARD.md
+    │   ├── OFFICIAL_DATA_AUDIT.md
+    │   └── REPRODUCIBILITY.md
+    └── reports/            # Validated evaluation & audit score reports
+        ├── final_dev_score.json
+        └── submission_validation.json
+```
 
 ---
-*Developed with precision for modern retail supply chain resilience.*
+
+## How to Run
+
+### Prerequisites
+- Python 3.10+ (tested on Python 3.10, 3.11, 3.12, 3.14)
+- A modern web browser (Chrome, Edge, Safari, Firefox)
+
+### 1. Install Dependencies
+```bash
+pip install -r FULL_CODE/requirements.txt
+```
+
+### 2. Run the Full Submission Pipeline
+To run data validation, point-in-time feature extraction, baseline verification, and test prediction generation:
+```bash
+python FULL_CODE/main.py
+```
+
+### 3. Launch the Interactive Operations Console
+To start the backend server and open the web dashboard:
+```bash
+python FULL_CODE/api/server.py
+```
+Then navigate to: `http://localhost:8080`
+
+- **Landing Portal**: Displays the split-screen landing screen. Click **`(skip)`** at the top right or within the form card to enter directly into the Store Operations Command Center.
+- **Google Sign-In**: Demonstrates enterprise retailer restrictions (displays `(only available for retailers)` modal).
+
+---
+
+## Environment Variables
+StockSentry AI is designed to run with **zero required configuration** out of the box. No external API keys are needed for core anomaly ranking, SQLite ground truth, or official evaluation.
+
+A template is provided at `FULL_CODE/.env.example`:
+```env
+# Optional external LLM providers for the web copilot:
+OPENAI_API_KEY=
+HUGGINGFACE_API_TOKEN=
+PORT=8080
+```
+
+---
+
+## How to Run Tests
+Run the complete automated test suite (17 tests covering algorithmic invariants, point-in-time leakage audits, and operational lifecycle):
+```bash
+python -m pytest FULL_CODE/tests -p no:qt -v
+```
+
+Expected output:
+```
+============================= 17 passed in 5.28s ==============================
+```
+
+---
+
+## Architecture & Data Flow
+
+```mermaid
+flowchart TD
+    subgraph Data Sources
+        DS1["daily_sales_inventory.parquet<br/>(7.97M rows)"]
+        DS2["store_master.csv / sku_master.csv"]
+        DS3["promotion_calendar.csv"]
+    end
+
+    subgraph Feature Engineering [No-Lookahead Trailing Filters]
+        F1["Zero-Sales Streak Analysis (t-N .. t-1)"]
+        F2["Poisson Demand Estimation (Trailing 30 Days)"]
+        F3["Dynamic Chain-Wide Delisted Filter"]
+    end
+
+    subgraph Ranking Core
+        RC1["Bayesian Anomaly Suspicion Score"]
+        RC2["Top-20 Sort per Store-Day"]
+        RC3["Calibrated Confidence & Diagnostic Reason"]
+    end
+
+    subgraph Operational Execution
+        UI1["Morning Queue (Top 20 Checks)"]
+        UI2["Physical Shelf Verification Walk"]
+        DB1[("SQLite Ground Truth Store")]
+        ERP["Two-Way ERP Sync Simulation"]
+    end
+
+    DS1 & DS2 & DS3 --> F1 & F2 & F3
+    F1 & F2 & F3 --> RC1 --> RC2 --> RC3
+    RC3 --> UI1 --> UI2 --> DB1 --> ERP
+```
+
+---
+
+## AI Usage Declaration
+- **Machine Learning & Statistical Core**: Custom point-in-time demand-inventory ranker authored specifically for this hackathon. Uses scipy Poisson distributions and vectorized numpy/pandas operations.
+- **AI Coding Assistants**: Claude and Gemini were utilized during development for code auditing, writing unit tests, and structuring documentation in accordance with TalentAP coding guidelines.
+- **LLM Integration**: An optional copilot assistant is available in the web interface; it defaults to zero-config local rule-based responses if cloud API keys are not supplied.
+
+---
+
+## Pre-Built and Third-Party Code
+- **Standard Open-Source Libraries**: `numpy`, `pandas`, `pyarrow`, `scipy`, `pytest` (MIT/BSD/Apache 2.0).
+- **Frontend Libraries**: Standard vanilla JavaScript with SheetJS (`xlsx.full.min.js`, Apache 2.0) for client-side spreadsheet parsing.
+- **Organizer Resources**: Evaluator logic conforms strictly to the challenge organizer's `evaluate.py`.
+
+---
+
+## Originality Declaration
+We declare that all application code, feature engineering logic, UI architecture, and submission generation scripts in this repository were developed specifically for the **TalentAP Mega Hackathon 2026**. No application code was copied from past projects or other hackathons.
+
+---
+
+## Limitations & Future Work
+- **Cold-Start SKUs**: Newly launched SKUs with fewer than 7 days of sales history rely on category-level demand priors; future versions could incorporate cross-store hierarchical Bayesian transfer.
+- **Planogram Spatial Tracking**: Current shelf verification identifies misplaced goods through associate feedback; future releases could integrate aisle coordinate data from store planograms (Bays/Sections) to direct staff directly to the misplaced shelf location.
+- **Live ERP Production Webhooks**: The current implementation features a controlled simulation of enterprise ERP write-downs; production deployment would connect directly to live SAP IDoc or Oracle RIB message queues.

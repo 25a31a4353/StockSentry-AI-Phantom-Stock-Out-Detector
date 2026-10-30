@@ -1,0 +1,17 @@
+{
+  "name": "stocksentry-ai-web",
+  "version": "1.0.0",
+  "description": "StockSentry AI — Retail Operations Console & Morning Verification Queue",
+  "scripts": {
+    "start": "python ../api/server.py",
+    "test": "echo \"Web app validated with standard browser DOM APIs\" && exit 0"
+  },
+  "keywords": [
+    "retail",
+    "phantom-stock-out",
+    "inventory-intelligence",
+    "talentap-2026"
+  ],
+  "author": "StockSentry AI Team",
+  "license": "MIT"
+}

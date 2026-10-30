@@ -28,11 +28,15 @@ from FULL_CODE.pipeline.predict import generate_ranked_predictions
 from FULL_CODE.pipeline.config import DATA_DIR, BEST_PARAMS
 
 
-class TestPointInTimeLeakageAudit:
+@pytest.fixture(scope="module")
+def full_panel():
+    parquet_file = DATA_DIR / "daily_sales_inventory.parquet"
+    if not parquet_file.exists():
+        pytest.skip("Official competition daily_sales_inventory.parquet dataset not present in data/")
+    return load_timeseries_panel(DATA_DIR)
 
-    @pytest.fixture(scope="class")
-    def full_panel(self):
-        return load_timeseries_panel(DATA_DIR)
+
+class TestPointInTimeLeakageAudit:
 
     @pytest.mark.parametrize("target_date", [
         "2026-07-31",

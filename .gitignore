@@ -1,14 +1,65 @@
+# Environment & Secrets (Rule 3)
+.env
+.env.*
+.env.local
+.env.production
+!.env.example
+
+# Competition & Raw Data (Never commit pack's large datasets)
+data/
+data/*
+*.parquet
+
+# Models & Weights
+models/
+*.pkl
+*.pickle
+*.bin
+*.pt
+*.onnx
+
+# Python & Virtual Environments
 __pycache__/
 *.py[cod]
 *$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage/
+*.egg-info/
+
+# Node & Frontend Build
+node_modules/
+dist/
+build/
+.next/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Databases & Local Runtime Storage (Rule 2: Don't commit .db or .sqlite)
+*.db
+*.sqlite
+*.sqlite3
+stocksentry.db
+
+# Logs & Temporary Files
+logs/
 *.log
-.vscode/
-.idea/
+*.tmp
+tmp/
+temp/
+*.zip
+
+# System & IDE
 .DS_Store
 Thumbs.db
-data/*.parquet
-data/*.csv
-models/
-.venv/
-.pytest_cache/
+.vscode/
+.idea/
 
+# Required submission file must NOT be ignored
+!submission/
+!submission/R1_predictions.csv
