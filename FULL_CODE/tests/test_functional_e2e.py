@@ -191,3 +191,4 @@ class TestMetricEnginePropagation(unittest.TestCase):
         updated_hits = sum(1 for sku in predictions if sku in ground_truth)
         updated_precision = updated_hits / len(predictions)
         self.assertEqual(updated_precision, 0.60)  # 3 / 5 = 60%
+

@@ -42,3 +42,4 @@ VALUES
     ('2026-10-30T09:15:00Z', '2026-10-30', 'S01', 'SKU-001', 'Premium Basmati Rice 5kg', 14, 0, -14, 'Confirmed Phantom Stock-Out', 'Shelf physically empty; zero on gondola. Reconciled inventory.', 'Priya Menon', 'SYNCED_TO_ERP', 11480.0),
     ('2026-10-30T09:42:00Z', '2026-10-30', 'S01', 'SKU-003', 'Organic Cold Pressed Mustard Oil 1L', 8, 2, -6, 'Misplaced Inventory Found', 'Recovered 2 units behind Aisle 4 cleaning section.', 'Priya Menon', 'SYNCED_TO_ERP', 4800.0),
     ('2026-10-30T10:05:00Z', '2026-10-30', 'S01', 'SKU-005', 'High-Protein Almond Drink 200ml', 22, 0, -22, 'Confirmed Phantom Stock-Out', 'System indicated 22 units on hand; backroom and shelf empty. Zero sales for 11 days.', 'Priya Menon', 'SYNCED_TO_ERP', 8520.0);
+

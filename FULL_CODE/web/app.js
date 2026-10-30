@@ -545,15 +545,14 @@
 
     return `
       <header class="topbar">
-        <div class="breadcrumb-area" style="display:flex;align-items:center;gap:10px">
-          <div>
+        <div class="breadcrumb-area">
+          <div style="white-space:nowrap;flex-shrink:0">
             <strong>Retail Ops</strong> / <span>${formatPageTitle(AppState.activePage)}</span>
           </div>
-          <div class="edge-ai-pill" style="display:inline-flex;align-items:center;gap:6px;background:rgba(37,99,235,0.07);border:1px solid rgba(37,99,235,0.22);border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700;color:#1d4ed8;cursor:pointer" onclick="document.querySelector('[data-page=settings]')?.click()" title="Active Inference Engine: Embedded Point-in-Time Bayesian Model (<2.5ms latency, ₹0 cost)">
-            <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;animation:pulseDot 2s infinite"></span>
-            <img src="assets/stocksentry_shield_icon.png" alt="AI Engine" style="width:13px;height:13px;object-fit:contain" />
+          <div class="topbar-ai-pill" onclick="document.querySelector('[data-page=settings]')?.click()" title="Active Inference Engine: Embedded Point-in-Time Bayesian Model (<2.5ms latency, ₹0 cost)">
+            <span class="pulse-live-dot"></span>
+            <img src="assets/stocksentry_shield_icon.png" alt="AI Engine" class="topbar-ai-icon" />
             <span>${currentProvider}</span>
-            <span style="font-size:9px;background:#10b981;color:#fff;border-radius:4px;padding:1px 5px;margin-left:2px">PROPER</span>
           </div>
         </div>
         <div class="topbar-controls">
@@ -2201,7 +2200,7 @@
             <div>
               <div style="display:flex;align-items:center;gap:8px">
                 <h3 style="font-size:17px;font-weight:800;color:var(--text-main);margin:0">Edge Neural AI (Zero-Config)</h3>
-                <span class="metric-badge badge-emerald" style="font-size:10px;font-weight:800">● PROPERLY CONFIGURED</span>
+                <span class="metric-badge badge-emerald" style="font-size:10px;font-weight:800">● ACTIVE &amp; OPERATIONAL</span>
               </div>
               <p style="font-size:12px;color:var(--text-sub);margin:3px 0 0">Embedded Point-in-Time Bayesian Poisson–Gamma Anomaly Inference Engine</p>
             </div>
@@ -2406,13 +2405,13 @@
     return `
       <div id="copilotDock" class="copilot-dock ${isMin ? 'minimized' : ''}">
         <div id="copilotHeader" class="copilot-header">
-          <div class="copilot-title" style="display:flex;align-items:center;gap:8px">
-            <img src="assets/stocksentry_shield_icon.png" alt="Copilot" style="width:20px;height:20px;object-fit:contain" />
-            <span>StockSentry Edge Copilot</span>
-            <span style="font-size:10px;padding:2px 7px;background:rgba(255,255,255,0.22);border-radius:999px;font-weight:700">⚡ Zero-Config Active</span>
+          <div class="copilot-title">
+            <img src="assets/stocksentry_shield_icon.png" alt="Copilot" style="width:18px;height:18px;object-fit:contain;flex-shrink:0" />
+            <span>StockSentry Copilot</span>
+            <span class="copilot-status-pill">${isMin ? '⚡ Edge' : '⚡ Zero-Config Active'}</span>
           </div>
-          <button id="toggleCopilotBtn" style="background:transparent;border:none;color:#fff;cursor:pointer;font-size:13px;font-weight:600">
-            ${isMin ? '▲ Expand Assistant' : '▼ Minimize'}
+          <button id="toggleCopilotBtn" class="copilot-toggle-btn">
+            ${isMin ? '▲ Expand' : '▼ Minimize'}
           </button>
         </div>
 
