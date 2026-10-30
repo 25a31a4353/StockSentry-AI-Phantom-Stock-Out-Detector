@@ -158,3 +158,4 @@ python FULL_CODE/pipeline/main.py
 2. **No Guaranteed Revenue**: The ₹3.01 Crore annual recovery estimate is an illustrative scenario derived from catalog averages (₹185 price, 2.2 units/day demand, 12 prevented lost days); it is not guaranteed real-world cash.
 3. **No Trained Neural/Tree AI**: The model is a **point-in-time Bayesian Poisson anomaly ranker**, not a trained deep neural network or XGBoost model.
 4. **No Live ERP Integration**: Live SAP S/4HANA or Oracle Retail integrations are architectural blueprints; the working system uses standard JSON REST APIs and local SQLite persistence.
+

@@ -874,3 +874,22 @@ body {
   .metrics-row { grid-template-columns: 1fr; }
   .copilot-dock { width: calc(100vw - 40px); right: 20px; }
 }
+
+/* Faded Out Verification State for Morning Queue & Physical Verification */
+.row-verified-faded {
+  opacity: 0.35 !important;
+  filter: grayscale(60%) !important;
+  background: rgba(16, 185, 129, 0.04) !important;
+  transition: all 0.4s ease-in-out !important;
+}
+.row-verified-faded:hover {
+  opacity: 0.70 !important;
+  filter: grayscale(10%) !important;
+}
+.row-verified-faded td {
+  color: var(--text-muted) !important;
+}
+.row-verified-faded .table-sku-id,
+.row-verified-faded .table-rank {
+  color: var(--accent-emerald) !important;
+}
