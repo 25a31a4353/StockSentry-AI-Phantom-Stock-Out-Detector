@@ -46,7 +46,8 @@
       { sender: 'bot', text: 'Good morning! I am **StockSentry AI**. Your Top-20 physical verification queue for today is prepared and calibrated with distinct Bayesian suspicion scores. How can I assist you with today\'s shelf walk?' }
     ],
     verifiedItems: JSON.parse(localStorage.getItem('ss_verified_feedback') || '[]'),
-    customDataset: null, // Loaded via CSV or Synthetic Generator
+    customDataset: null, // Loaded via CSV, Excel, Folder Batch, or Synthetic Generator
+    customStores: null, // Custom store metadata loaded via batch store_master.csv
     filterSearch: '',
     filterScore: 'all',
     filterCategory: 'all',
@@ -83,6 +84,9 @@
   }
 
   function getAvailableStores() {
+    if (AppState.customStores && AppState.customStores.length > 0) {
+      return AppState.customStores;
+    }
     if (AppState.customDataset && AppState.customDataset.length > 0) {
       const uniqueStoreIds = [...new Set(AppState.customDataset.map(r => r.store_id))].filter(Boolean).sort();
       return uniqueStoreIds.map(st => {
@@ -1617,20 +1621,32 @@
             <img src="assets/batch_csv_upload.jpg" alt="POS CSV Batch Drop Integration" />
           </div>
           <div class="integration-body">
-            <span class="integration-badge badge-emerald">Option 2: Zero-Config File Drop</span>
+            <span class="integration-badge badge-emerald">Option 2: Zero-Config File &amp; Folder Drop</span>
             <h3 style="font-size:17px;font-weight:750;color:var(--text-main);margin-bottom:8px">POS CSV / Excel Batch Drop</h3>
             <p style="font-size:13px;color:var(--text-sub);line-height:1.5;margin-bottom:14px">
-              Upload your store's daily POS checkout records directly. Ideal for regional supermarket chains without API infrastructure or for instant proof-of-value.
+              Upload your store's daily POS checkout records or <strong>upload an entire data folder</strong>. The decision engine auto-detects schemas, links master catalogs, and computes all outputs exclusively on the uploaded data.
             </p>
             <div style="background:#f8fafc;padding:12px;border:1px solid var(--light-border);border-radius:6px;font-size:12px;margin-bottom:16px">
-              <strong>Mandatory Columns:</strong> <code>date</code>, <code>store_id</code>, <code>sku_id</code>, <code>units_sold</code>, <code>on_hand_qty</code>.<br>
-              <strong>Optional:</strong> <code>price</code>, <code>promotion</code>, <code>category</code>, <code>label</code>.
+              <strong>Supported:</strong> Whole Folders, Multi-File Batches, or Single CSV/Excel (auto-links <code>sku_master</code>, <code>store_master</code>, <code>daily_sales_inventory</code>).<br>
+              <strong>Columns:</strong> <code>date</code>, <code>store_id</code>, <code>sku_id</code>, <code>units_sold</code>, <code>on_hand_eod</code>.
             </div>
-            <div style="margin-top:auto">
-              <label for="integrationCsvFile" class="btn btn-emerald" style="width:100%;display:inline-block;text-align:center;cursor:pointer">
-                📁 Upload Store CSV File
+            <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+              <label for="integrationFolderInput" class="btn btn-emerald" style="width:100%;display:inline-block;text-align:center;cursor:pointer">
+                📂 Upload Whole Folder (Batch Drop)
               </label>
-              <input type="file" id="integrationCsvFile" accept=".csv" style="display:none" />
+              <input type="file" id="integrationFolderInput" webkitdirectory directory multiple style="display:none" />
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <label for="integrationCsvFile" class="btn btn-secondary" style="display:inline-block;text-align:center;cursor:pointer;font-size:12px;padding:8px">
+                  📁 Single CSV/Excel
+                </label>
+                <input type="file" id="integrationCsvFile" accept=".csv,.tsv,.txt,.xlsx,.xls" style="display:none" />
+
+                <label for="integrationBatchInput" class="btn btn-secondary" style="display:inline-block;text-align:center;cursor:pointer;font-size:12px;padding:8px">
+                  📑 Multi-File Batch
+                </label>
+                <input type="file" id="integrationBatchInput" multiple accept=".csv,.tsv,.txt,.xlsx,.xls" style="display:none" />
+              </div>
             </div>
           </div>
         </div>
@@ -1663,25 +1679,44 @@
         <div class="panel-title-area">
           <div>
             <h3>Live CSV / POS Ingestion Dropzone</h3>
-            <p>Upload your retail transaction logs to run StockSentry's Bayesian engine on your actual store data</p>
+            <p>Upload a complete folder or drop batch files to run StockSentry's Bayesian engine on your actual store data</p>
           </div>
-          <span id="uploadStatusBadge" class="metric-badge badge-emerald">Ready for Ingestion</span>
+          <span id="uploadStatusBadge" class="metric-badge ${AppState.customDataset ? 'badge-amber' : 'badge-emerald'}">
+            ${AppState.customDataset ? 'Custom Batch Active' : 'Ready for Ingestion'}
+          </span>
         </div>
 
-        <div id="csvDropZone" class="dropzone-box">
-          <div style="font-size:32px;margin-bottom:8px">📥</div>
-          <strong style="font-size:14px;color:var(--text-main);display:block;margin-bottom:4px">
-            Drag and drop your store CSV file here, or click to browse
+        ${AppState.customDataset ? `
+          <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:18px">⚠️</span>
+              <div style="font-size:13px;color:#92400e">
+                <strong>Custom Dataset Currently Active:</strong> Decision engine is generating all outputs exclusively on <strong>${AppState.customDataset.length.toLocaleString()} uploaded rows</strong> across <strong>${getAvailableStores().length} stores</strong>. Official jury data remains preserved.
+              </div>
+            </div>
+            <button id="resetDataFromIntegrationBtn" class="btn btn-secondary" style="padding:5px 12px;font-size:11px;font-weight:700">↺ Reset to Official Data</button>
+          </div>
+        ` : ''}
+
+        <div id="csvDropZone" class="dropzone-box" style="cursor:pointer">
+          <div style="font-size:36px;margin-bottom:8px">📥</div>
+          <strong style="font-size:15px;color:var(--text-main);display:block;margin-bottom:6px">
+            Drag and drop a Whole Folder or Batch of POS CSV / Excel files here
           </strong>
-          <span style="font-size:12px;color:var(--text-sub)">
-            Supports UTF-8 CSV exports with columns: <code>date, store_id, sku_id, units_sold, on_hand_qty</code>
+          <span style="font-size:12px;color:var(--text-sub);display:block;margin-bottom:8px">
+            Supports whole folders (with master files), multiple store exports, or single CSV/Excel files. The engine parses transactions and auto-links master files.
           </span>
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
+            <span class="metric-badge badge-emerald">Whole Folder Drag &amp; Drop</span>
+            <span class="metric-badge badge-indigo">Auto Catalog Matching</span>
+            <span class="metric-badge badge-secondary">CSV &amp; Excel (.xlsx)</span>
+          </div>
         </div>
 
         <div id="csvUploadPreviewArea" style="margin-top:20px;display:none">
           <h4 style="font-size:14px;font-weight:700;color:var(--text-main);margin-bottom:10px">Ingestion Preview &amp; Schema Validation</h4>
           <div id="csvUploadSummary" style="font-size:13px;color:var(--text-body);margin-bottom:12px"></div>
-          <button id="activateUploadedDataBtn" class="btn btn-emerald">✓ Run StockSentry AI on this Dataset</button>
+          <button id="activateUploadedDataBtn" class="btn btn-emerald">✓ View Morning Queue on this Dataset</button>
         </div>
       </div>
     `;
@@ -1906,6 +1941,47 @@
               <span style="font-size:12px;font-weight:700;color:var(--text-main)">Database Persistence</span>
               <p style="font-size:12px;color:var(--text-sub);margin-top:2px">Engine: <strong>SQLite 3</strong> (<code>stocksentry.db</code>) with real-time ERP write-down.</p>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-card" style="margin-top:24px;border:1px solid ${AppState.customDataset ? 'var(--accent-amber)' : 'var(--light-border)'}">
+        <div class="panel-title-area">
+          <div>
+            <h3>Active Dataset &amp; Official Jury Benchmark Reset</h3>
+            <p>Manage uploaded POS / Excel batches and restore official hackathon jury ground truth</p>
+          </div>
+          ${AppState.customDataset ? `
+            <span class="metric-badge badge-amber">Custom POS Batch Active</span>
+          ` : `
+            <span class="metric-badge badge-emerald">Official Jury Dataset Active</span>
+          `}
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="padding:14px;background:var(--light-bg-subtle);border:1px solid var(--light-border);border-radius:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span style="font-size:12px;font-weight:750;color:var(--text-main)">CURRENT DECISION ENGINE DATASET</span>
+              <strong>${AppState.customDataset ? 'Custom Uploaded Batch' : 'Official Competition Jury Dataset'}</strong>
+            </div>
+            <p style="font-size:12px;color:var(--text-sub);line-height:1.5">
+              ${AppState.customDataset ? `
+                The decision engine is currently generating all suspicion scores, queues, and diagnostics strictly based on your uploaded <strong>${AppState.customDataset.length.toLocaleString()} rows</strong> across <strong>${getAvailableStores().length} stores</strong>.<br>
+                <em>The original official competition jury dataset (25 stores, 800 SKUs, 7,970,112 rows) remains 100% preserved in system memory and will not be touched or lost.</em>
+              ` : `
+                The decision engine is running on the complete official hackathon dataset (25 stores, 800 SKUs, 548 days, 7,970,112 rows). Official evaluator baseline: <strong>39.65%</strong> &bull; StockSentry Precision@20: <strong>40.55%</strong>.
+              `}
+            </p>
+          </div>
+
+          <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;padding-top:4px">
+            <div>
+              <strong style="font-size:13px;color:var(--text-main)">Reset Engine to Official Data</strong>
+              <p style="font-size:11px;color:var(--text-muted);margin-top:2px">Removes temporary uploaded batch data and instantly restores the official competition jury dataset.</p>
+            </div>
+            <button id="resetToOfficialDataBtn" class="btn ${AppState.customDataset ? 'btn-rose' : 'btn-secondary'}" style="padding:8px 18px;font-size:12px;font-weight:700" ${AppState.customDataset ? '' : 'disabled'}>
+              ↺ Reset Uploaded Data
+            </button>
           </div>
         </div>
       </div>
@@ -2501,31 +2577,62 @@
       };
     }
 
-    const fileInput = document.getElementById('integrationCsvFile');
-    const dropZone = document.getElementById('csvDropZone');
-
-    function handleCsvFile(file) {
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        parseAndIngestCsv(e.target.result, file.name);
-      };
-      reader.readAsText(file);
+    // Reset dataset to official jury ground truth
+    const resetDataBtn = document.getElementById('resetToOfficialDataBtn');
+    if (resetDataBtn) {
+      resetDataBtn.onclick = resetDataset;
+    }
+    const resetDataBtn2 = document.getElementById('resetDataFromIntegrationBtn');
+    if (resetDataBtn2) {
+      resetDataBtn2.onclick = resetDataset;
     }
 
+    const fileInput = document.getElementById('integrationCsvFile');
+    const folderInput = document.getElementById('integrationFolderInput');
+    const batchInput = document.getElementById('integrationBatchInput');
+    const dropZone = document.getElementById('csvDropZone');
+
     if (fileInput) {
-      fileInput.onchange = (e) => handleCsvFile(e.target.files[0]);
+      fileInput.onchange = (e) => parseBatchFiles(e.target.files, 'Single File Upload');
+    }
+    if (folderInput) {
+      folderInput.onchange = (e) => parseBatchFiles(e.target.files, 'Folder Upload');
+    }
+    if (batchInput) {
+      batchInput.onchange = (e) => parseBatchFiles(e.target.files, 'Multi-File Batch');
     }
 
     if (dropZone) {
-      dropZone.onclick = () => fileInput && fileInput.click();
+      dropZone.onclick = (e) => {
+        if (folderInput) folderInput.click();
+        else if (fileInput) fileInput.click();
+      };
       dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('dragover'); };
       dropZone.ondragleave = () => dropZone.classList.remove('dragover');
-      dropZone.ondrop = (e) => {
+      dropZone.ondrop = async (e) => {
         e.preventDefault();
         dropZone.classList.remove('dragover');
-        if (e.dataTransfer.files.length > 0) {
-          handleCsvFile(e.dataTransfer.files[0]);
+        const items = e.dataTransfer.items;
+        if (items && items.length > 0) {
+          const files = [];
+          for (let i = 0; i < items.length; i++) {
+            const entry = items[i].webkitGetAsEntry ? items[i].webkitGetAsEntry() : null;
+            if (entry) {
+              const res = await traverseFileTree(entry);
+              if (Array.isArray(res)) files.push(...res);
+              else if (res) files.push(res);
+            } else {
+              const f = items[i].getAsFile();
+              if (f) files.push(f);
+            }
+          }
+          if (files.length > 0) {
+            parseBatchFiles(files, 'Drag & Drop Folder/Batch');
+            return;
+          }
+        }
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          parseBatchFiles(e.dataTransfer.files, 'Drag & Drop Files');
         }
       };
     }
@@ -2562,83 +2669,234 @@
     });
   }
 
-  function parseAndIngestCsv(text, filename) {
-    try {
-      const lines = text.trim().split(/\r?\n/).filter(l => l.trim().length > 0);
-      if (lines.length < 2) {
-        toast('❌ CSV file must contain a header row and at least one data row.');
-        return;
+  // Reset custom dataset back to official competition jury dataset without touching existing data
+  function resetDataset() {
+    if (!AppState.customDataset) {
+      toast('Official competition dataset is already active.');
+      return;
+    }
+    AppState.customDataset = null;
+    AppState.customStores = null;
+    const dates = getAvailableDates();
+    AppState.activeDate = dates.includes('2026-09-02') ? '2026-09-02' : dates[dates.length - 1];
+    AppState.activeStore = 'ALL';
+    toast('✓ Decision engine reset to official hackathon jury dataset (25 stores, 800 SKUs).');
+    renderApp();
+  }
+
+  async function traverseFileTree(entry) {
+    if (entry.isFile) {
+      return new Promise(resolve => entry.file(resolve));
+    } else if (entry.isDirectory) {
+      const dirReader = entry.createReader();
+      const entries = await new Promise(resolve => {
+        dirReader.readEntries(resolve, () => resolve([]));
+      });
+      const nestedFiles = await Promise.all(entries.map(e => traverseFileTree(e)));
+      return nestedFiles.flat();
+    }
+    return [];
+  }
+
+  // Read file as text, with transparent XLSX/Excel support
+  function readFileContent(file) {
+    if (file.text && typeof file.text === 'string') {
+      return Promise.resolve(file);
+    }
+    return new Promise((resolve, reject) => {
+      const isExcel = file.name && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'));
+      const reader = new FileReader();
+      if (isExcel && window.XLSX) {
+        reader.onload = e => {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const csv = XLSX.utils.sheet_to_csv(sheet);
+            resolve({ name: file.name, text: csv, isExcel: true });
+          } catch (err) {
+            resolve({ name: file.name, text: '', error: err });
+          }
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+      } else {
+        reader.onload = e => resolve({ name: file.name, text: e.target.result, isExcel: false });
+        reader.onerror = reject;
+        reader.readAsText(file);
       }
+    });
+  }
+
+  // Parse batch / folder of files
+  async function parseBatchFiles(filesList, sourceName = 'Batch Drop') {
+    if (!filesList || filesList.length === 0) return;
+    const files = Array.from(filesList).filter(f => f && (f.name.endsWith('.csv') || f.name.endsWith('.tsv') || f.name.endsWith('.txt') || f.name.endsWith('.xlsx') || f.name.endsWith('.xls') || f.text));
+    if (files.length === 0) {
+      toast('⚠️ No CSV, TSV, or Excel files found in the selected batch.');
+      return;
+    }
+
+    toast(`⏳ Reading ${files.length} file(s) from ${sourceName}...`);
+    const readResults = await Promise.all(files.map(f => readFileContent(f)));
+    const validFiles = readResults.filter(f => f.text && f.text.trim().length > 0);
+
+    if (validFiles.length === 0) {
+      toast('❌ No readable CSV/Excel text found in the files.');
+      return;
+    }
+
+    const skuMasterMap = new Map();
+    const storeMasterMap = new Map();
+    const promoSet = new Set();
+    const salesFiles = [];
+
+    for (const f of validFiles) {
+      const lowerName = (f.name || '').toLowerCase();
+      const lines = f.text.trim().split(/\r?\n/).filter(l => l.trim().length > 0);
+      if (lines.length < 2) continue;
+
       const firstLine = lines[0];
-      const delimiter = firstLine.includes('\t') ? '\t' : (firstLine.includes(';') && !firstLine.includes(',')) ? ';' : ',';
-      const headers = firstLine.split(delimiter).map(h => h.trim().replace(/^["']|["']$/g, '').toLowerCase());
-      
+      const delim = firstLine.includes('\t') ? '\t' : (firstLine.includes(';') && !firstLine.includes(',')) ? ';' : ',';
+      const headers = firstLine.split(delim).map(h => h.trim().replace(/^["']|["']$/g, '').toLowerCase());
+
+      if (lowerName.includes('sku_master') || (headers.includes('sku_id') && (headers.includes('product_name') || headers.includes('description') || headers.includes('sku_name')))) {
+        const skuIdx = headers.indexOf('sku_id');
+        const nameIdx = headers.indexOf('product_name') !== -1 ? headers.indexOf('product_name') : (headers.indexOf('sku_name') !== -1 ? headers.indexOf('sku_name') : headers.indexOf('description'));
+        const catIdx = headers.indexOf('category');
+        const priceIdx = headers.indexOf('unit_price_inr') !== -1 ? headers.indexOf('unit_price_inr') : headers.indexOf('price');
+        for (let i = 1; i < lines.length; i++) {
+          const parts = lines[i].split(delim).map(p => p.trim().replace(/^["']|["']$/g, ''));
+          if (parts[skuIdx]) {
+            skuMasterMap.set(parts[skuIdx], {
+              name: nameIdx !== -1 ? parts[nameIdx] : parts[skuIdx],
+              category: catIdx !== -1 ? parts[catIdx] : 'General Merchandise',
+              price: priceIdx !== -1 ? (parseFloat(parts[priceIdx]) || 120) : 120
+            });
+          }
+        }
+      } else if (lowerName.includes('store_master') || (headers.includes('store_id') && headers.includes('city'))) {
+        const storeIdx = headers.indexOf('store_id');
+        const cityIdx = headers.indexOf('city');
+        const tierIdx = headers.indexOf('tier');
+        const formatIdx = headers.indexOf('format');
+        const mgrIdx = headers.indexOf('manager') !== -1 ? headers.indexOf('manager') : headers.indexOf('store_manager');
+        for (let i = 1; i < lines.length; i++) {
+          const parts = lines[i].split(delim).map(p => p.trim().replace(/^["']|["']$/g, ''));
+          if (parts[storeIdx]) {
+            storeMasterMap.set(parts[storeIdx], {
+              id: parts[storeIdx],
+              name: `Store ${parts[storeIdx]} (${parts[cityIdx] || 'Metro'})`,
+              city: cityIdx !== -1 ? parts[cityIdx] : 'Metro',
+              tier: tierIdx !== -1 ? parts[tierIdx] : 'Tier 1',
+              format: formatIdx !== -1 ? parts[formatIdx] : 'Supermarket',
+              manager: mgrIdx !== -1 ? parts[mgrIdx] : 'Store Manager'
+            });
+          }
+        }
+      } else if (lowerName.includes('promotion') || (headers.includes('sku_id') && headers.includes('date') && headers.includes('discount'))) {
+        const dateIdx = headers.indexOf('date');
+        const skuIdx = headers.indexOf('sku_id');
+        const storeIdx = headers.indexOf('store_id');
+        for (let i = 1; i < lines.length; i++) {
+          const parts = lines[i].split(delim).map(p => p.trim().replace(/^["']|["']$/g, ''));
+          if (parts[dateIdx] && parts[skuIdx]) {
+            const st = storeIdx !== -1 ? parts[storeIdx] : 'ALL';
+            promoSet.add(`${parts[dateIdx]}|${parts[skuIdx]}|${st}`);
+          }
+        }
+      } else {
+        salesFiles.push({ ...f, lines, delim, headers });
+      }
+    }
+
+    const allRecords = [];
+    for (const sf of salesFiles) {
+      const { headers, delim, lines } = sf;
       const dateIdx = headers.indexOf('date');
       const storeIdx = headers.indexOf('store_id') !== -1 ? headers.indexOf('store_id') : headers.indexOf('store');
       const skuIdx = headers.indexOf('sku_id') !== -1 ? headers.indexOf('sku_id') : headers.indexOf('sku');
       const soldIdx = headers.indexOf('units_sold') !== -1 ? headers.indexOf('units_sold') : (headers.indexOf('sales') !== -1 ? headers.indexOf('sales') : headers.indexOf('sold'));
-      
-      // Support official jury schema (on_hand_eod), on_hand_qty, on_hand, or stock
-      let stockIdx = headers.indexOf('on_hand_eod');
-      if (stockIdx === -1) stockIdx = headers.indexOf('on_hand_qty');
-      if (stockIdx === -1) stockIdx = headers.indexOf('on_hand');
-      if (stockIdx === -1) stockIdx = headers.indexOf('stock');
+      let stockIdx = headers.indexOf('on_hand_eod') !== -1 ? headers.indexOf('on_hand_eod') : (headers.indexOf('on_hand_qty') !== -1 ? headers.indexOf('on_hand_qty') : (headers.indexOf('on_hand') !== -1 ? headers.indexOf('on_hand') : headers.indexOf('stock')));
 
       if (dateIdx === -1 || storeIdx === -1 || skuIdx === -1 || soldIdx === -1 || stockIdx === -1) {
-        toast('❌ Missing required columns. Required: date, store_id, sku_id, units_sold, and on_hand_eod (or on_hand_qty)');
-        return;
+        continue;
       }
 
       const priceIdx = headers.indexOf('price') !== -1 ? headers.indexOf('price') : headers.indexOf('unit_price_inr');
-      let promoIdx = headers.indexOf('on_promo');
-      if (promoIdx === -1) promoIdx = headers.indexOf('promotion');
+      let promoIdx = headers.indexOf('on_promo') !== -1 ? headers.indexOf('on_promo') : headers.indexOf('promotion');
       const catIdx = headers.indexOf('category');
-
       const minRequiredCols = Math.max(dateIdx, storeIdx, skuIdx, soldIdx, stockIdx);
-      const parsedRecords = [];
+
       for (let i = 1; i < lines.length; i++) {
-        const parts = lines[i].split(delimiter).map(p => p.trim().replace(/^["']|["']$/g, ''));
+        const parts = lines[i].split(delim).map(p => p.trim().replace(/^["']|["']$/g, ''));
         if (parts.length > minRequiredCols && parts[dateIdx] && parts[storeIdx] && parts[skuIdx]) {
-          parsedRecords.push({
-            date: parts[dateIdx],
-            store_id: parts[storeIdx],
-            sku_id: parts[skuIdx],
+          const skuId = parts[skuIdx];
+          const storeId = parts[storeIdx];
+          const date = parts[dateIdx];
+          const skuInfo = skuMasterMap.get(skuId);
+          const isPromo = (promoIdx !== -1 && (parseInt(parts[promoIdx], 10) === 1)) || promoSet.has(`${date}|${skuId}|${storeId}`) || promoSet.has(`${date}|${skuId}|ALL`);
+
+          allRecords.push({
+            date,
+            store_id: storeId,
+            sku_id: skuId,
             units_sold: parseInt(parts[soldIdx], 10) || 0,
             on_hand_qty: parseInt(parts[stockIdx], 10) || 0,
-            price: priceIdx !== -1 ? parseFloat(parts[priceIdx]) || 120 : 120,
-            promotion: promoIdx !== -1 ? parseInt(parts[promoIdx], 10) || 0 : 0,
-            category: catIdx !== -1 && parts[catIdx] ? parts[catIdx] : 'General Merchandise',
-            product: `${parts[skuIdx]} (Store Assortment)`
+            price: priceIdx !== -1 ? (parseFloat(parts[priceIdx]) || 120) : (skuInfo ? skuInfo.price : 120),
+            promotion: isPromo ? 1 : 0,
+            category: catIdx !== -1 && parts[catIdx] ? parts[catIdx] : (skuInfo ? skuInfo.category : 'General Merchandise'),
+            product: skuInfo ? skuInfo.name : `${skuId} (Store Assortment)`
           });
         }
       }
-
-      if (parsedRecords.length === 0) {
-        toast('❌ No valid data rows could be parsed from the CSV.');
-        return;
-      }
-
-      AppState.customDataset = parsedRecords;
-      const dates = getAvailableDates();
-      AppState.activeDate = dates[dates.length - 1];
-      const availStores = getAvailableStores();
-      if (!availStores.some(s => s.id === AppState.activeStore)) {
-        AppState.activeStore = availStores[0]?.id || 'ALL';
-      }
-
-      // Async push to SQLite backend API if online
-      fetch('/api/ingest', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ records: parsedRecords.slice(0, 500), source: `CSV Upload (${filename})` })
-      }).catch(e => console.warn('Backend ingest sync skipped:', e));
-
-      toast(`✓ Ingested ${parsedRecords.length.toLocaleString()} rows from ${filename}! Loaded stores: ${[...new Set(parsedRecords.map(r => r.store_id))].join(', ')}.`);
-      renderApp();
-    } catch (err) {
-      console.error('CSV Parsing Error:', err);
-      toast('❌ Error parsing CSV file: ' + err.message);
     }
+
+    if (allRecords.length === 0) {
+      toast('❌ No sales transaction records found with required columns (date, store_id, sku_id, units_sold, on_hand_eod).');
+      return;
+    }
+
+    AppState.customDataset = allRecords;
+    AppState.customStores = storeMasterMap.size > 0 ? Array.from(storeMasterMap.values()) : null;
+
+    const dates = getAvailableDates();
+    AppState.activeDate = dates[dates.length - 1];
+    const availStores = getAvailableStores();
+    AppState.activeStore = availStores[0]?.id || 'ALL';
+
+    const uniqueStores = [...new Set(allRecords.map(r => r.store_id))];
+    const uniqueSkus = [...new Set(allRecords.map(r => r.sku_id))];
+
+    const previewArea = document.getElementById('csvUploadPreviewArea');
+    const summaryEl = document.getElementById('csvUploadSummary');
+    if (previewArea && summaryEl) {
+      previewArea.style.display = 'block';
+      summaryEl.innerHTML = `
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;color:#166534;line-height:1.6">
+          <strong style="font-size:14px">✓ Batch &amp; Folder Ingestion Succeeded (${esc(sourceName)}):</strong><br>
+          • <strong>${validFiles.length} files processed</strong> (${salesFiles.length} sales tables, ${skuMasterMap.size} catalog SKUs linked, ${storeMasterMap.size} stores configured).<br>
+          • Ingested <strong>${allRecords.length.toLocaleString()} rows</strong> across <strong>${uniqueStores.length} stores</strong> (<code>${uniqueStores.slice(0, 10).join(', ')}${uniqueStores.length > 10 ? '...' : ''}</code>) and <strong>${uniqueSkus.length} unique SKUs</strong>.<br>
+          • Temporal span: <strong>${dates[0]}</strong> to <strong>${dates[dates.length - 1]}</strong> (${dates.length} days).<br>
+          • Decision engine outputs are now <strong>100% computed exclusively on this batch</strong>.<br>
+          • <em>You can reset back to the official jury dataset anytime in Settings.</em>
+        </div>
+      `;
+    }
+
+    // Async push sample to backend API if online
+    fetch('/api/ingest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ records: allRecords.slice(0, 500), source: sourceName })
+    }).catch(e => console.warn('Backend ingest sync skipped:', e));
+
+    toast(`✓ Successfully ingested ${allRecords.length.toLocaleString()} records across ${uniqueStores.length} stores! Decision engine updated.`);
+    renderApp();
+  }
+
+  function parseAndIngestCsv(text, filename) {
+    parseBatchFiles([{ name: filename, text }], `Single File (${filename})`);
   }
 
   // High-Quality CSV Export with Distinct Scores & Confidences
