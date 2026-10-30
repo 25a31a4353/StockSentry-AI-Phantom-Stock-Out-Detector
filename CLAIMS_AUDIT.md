@@ -104,3 +104,4 @@
   * **Operational Today**: Standard JSON REST API (`/api/ingest`, `/api/verify`) and drag-and-drop POS CSV Batch Drop.
   * **Connector Architecture Defined**: Technical specifications documented for SAP S/4HANA (OData/RFC), Oracle Retail (RMS API), and Zebra EMDK Android scanners.
   * Clear architectural distinction maintained between implemented sandbox adapters and enterprise connector blueprints.
+

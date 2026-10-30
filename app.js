@@ -239,14 +239,6 @@
             ✓ ${verifiedCount}/20 Verified
           </div>
 
-          <a href="/StockSentry_AI_Master_Documentation_and_PRD.pdf" target="_blank" download class="btn btn-primary" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-size:12px;padding:6px 12px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border-radius:6px;font-weight:600" title="Download 10-Page Master Project Documentation & PRD">
-            📄 Master PRD (PDF)
-          </a>
-
-          <a href="/StockSentry_AI_Live_Demo_Walkthrough.mp4" target="_blank" class="btn btn-secondary" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-size:12px;padding:6px 12px;font-weight:600" title="Watch 3-Minute Live Demo Video Walkthrough">
-            🎥 Demo Video
-          </a>
-
           <button id="quickExportBtn" class="btn btn-secondary">Export Top 20</button>
         </div>
       </header>
