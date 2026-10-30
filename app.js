@@ -35,6 +35,7 @@
 
   // Application State
   const AppState = {
+    isAuthenticated: false, // Initial authentication & landing screen
     user: JSON.parse(localStorage.getItem('ss_user') || '{"name":"Priya Menon","role":"Store Operations Lead"}'),
     activeStore: localStorage.getItem('ss_active_store') || 'S01',
     activeDate: '',
@@ -154,6 +155,12 @@
   }
 
   function renderApp() {
+    if (!AppState.isAuthenticated) {
+      appEl.innerHTML = renderAuthScreen();
+      attachAuthEvents();
+      return;
+    }
+
     appEl.innerHTML = `
       ${renderSidebar()}
       <div class="main-wrapper">
@@ -166,6 +173,307 @@
       ${renderVerificationModal()}
     `;
     attachEvents();
+  }
+
+  // Authentication & Landing Screen Component
+  function renderAuthScreen() {
+    return `
+      <div class="auth-page-container">
+        <!-- Left Hero Panel -->
+        <div class="auth-hero-panel">
+          <div class="auth-brand-header">
+            <div class="auth-brand-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8" cy="21" r="2"></circle>
+                <circle cx="19" cy="21" r="2"></circle>
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="auth-brand-name">StockSentry <span class="brand-ai">AI</span></div>
+              <span class="auth-brand-sub">RETAIL INVENTORY INTELLIGENCE</span>
+            </div>
+          </div>
+
+          <div class="auth-hero-content">
+            <h1 class="auth-hero-heading">
+              Detect Invisible<br>
+              <span class="auth-highlight-blue">Stock-Outs</span> Before<br>
+              They Impact Sales
+            </h1>
+            <p class="auth-hero-desc">
+              AI-powered insights to find SKUs that show stock in the system but are missing on shelves. Help store managers focus on the right items, every day.
+            </p>
+
+            <div class="auth-value-props">
+              <div class="auth-prop-item">
+                <div class="auth-prop-icon icon-rose">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                  </svg>
+                </div>
+                <div>
+                  <div class="auth-prop-title">Higher Sales</div>
+                  <div class="auth-prop-sub">Recover lost revenue</div>
+                </div>
+              </div>
+
+              <div class="auth-prop-item">
+                <div class="auth-prop-icon icon-emerald">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m7.5 4.27 9 5.15"></path>
+                    <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+                    <path d="m3.3 7 8.7 5 8.7-5"></path>
+                    <path d="M12 22V12"></path>
+                  </svg>
+                </div>
+                <div>
+                  <div class="auth-prop-title">Better Availability</div>
+                  <div class="auth-prop-sub">Happier customers</div>
+                </div>
+              </div>
+
+              <div class="auth-prop-item">
+                <div class="auth-prop-icon icon-indigo">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                </div>
+                <div>
+                  <div class="auth-prop-title">Smarter Operations</div>
+                  <div class="auth-prop-sub">Data-driven decisions</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="auth-stats-bar">
+            <div class="auth-stat-col">
+              <span class="auth-stat-icon">📊</span>
+              <div>
+                <span class="auth-stat-num">800</span>
+                <span class="auth-stat-label">Total SKUs</span>
+              </div>
+            </div>
+            <div class="auth-stat-divider"></div>
+            <div class="auth-stat-col">
+              <span class="auth-stat-icon">🏪</span>
+              <div>
+                <span class="auth-stat-num">25</span>
+                <span class="auth-stat-label">Stores</span>
+              </div>
+            </div>
+            <div class="auth-stat-divider"></div>
+            <div class="auth-stat-col">
+              <span class="auth-stat-icon">📅</span>
+              <div>
+                <span class="auth-stat-num">18 Months</span>
+                <span class="auth-stat-label">Daily Sales Data</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Form Panel -->
+        <div class="auth-form-panel">
+          <div class="auth-top-actions">
+            <button id="authSkipTopBtn" class="auth-skip-pill" type="button" title="Directly open dashboard website">
+              (skip)
+            </button>
+            <div class="auth-icon-btn" title="Toggle theme">🌙</div>
+            <div class="auth-lang-pill">🌐 English ▾</div>
+          </div>
+
+          <div class="auth-card">
+            <div class="auth-card-icon">
+              <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8" cy="21" r="2"></circle>
+                <circle cx="19" cy="21" r="2"></circle>
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+              </svg>
+            </div>
+            <h2 class="auth-card-title">StockSentry <span style="color:#2563eb">AI</span></h2>
+            <p class="auth-card-subtitle">Sign in to continue</p>
+
+            <form id="authLoginForm" onsubmit="return false;">
+              <div class="auth-field-group">
+                <label class="auth-label" for="authEmail">Email</label>
+                <div class="auth-input-container">
+                  <span class="auth-field-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+                      <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                    </svg>
+                  </span>
+                  <input id="authEmail" class="auth-input" type="email" value="store.ops@stocksentry.retail.ai" placeholder="you@company.com" autocomplete="username">
+                </div>
+              </div>
+
+              <div class="auth-field-group">
+                <label class="auth-label" for="authPassword">Password</label>
+                <div class="auth-input-container">
+                  <span class="auth-field-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+                      <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                  </span>
+                  <input id="authPassword" class="auth-input" type="password" value="••••••••••••" placeholder="Enter your password" autocomplete="current-password">
+                  <button id="authTogglePasswordBtn" type="button" class="auth-eye-btn" title="Toggle password visibility">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="auth-options-row">
+                <label class="auth-checkbox-label">
+                  <input type="checkbox" id="authRememberMe" checked>
+                  <span>Remember me</span>
+                </label>
+                <a href="#forgot" class="auth-forgot-link" onclick="event.preventDefault(); alert('Please reach out to your enterprise administrator or use the (skip) button to proceed.');">Forgot password?</a>
+              </div>
+
+              <button id="authSubmitBtn" type="submit" class="auth-primary-btn">
+                <span>Sign In</span>
+                <span>→</span>
+              </button>
+
+              <button id="authSkipMainBtn" type="button" class="auth-skip-main-btn" title="Skip authentication and enter dashboard">
+                ⚡ (skip) Go Directly to Website →
+              </button>
+            </form>
+
+            <div class="auth-or-divider">
+              <span>or continue with</span>
+            </div>
+
+            <button id="authGoogleBtn" type="button" class="auth-google-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              </svg>
+              <span>Sign in with Google</span>
+            </button>
+
+            <div class="auth-footer-note">
+              Don't have an account? <a href="#contact" onclick="event.preventDefault(); alert('Please contact store support: admin@stocksentry.retail.ai');">Contact your administrator.</a>
+            </div>
+          </div>
+
+          <div style="text-align:center;font-size:11px;color:#94a3b8;padding-top:12px">
+            TalentAP Hackathon 2026 · Problem R1 Official Jury Milestone
+          </div>
+        </div>
+
+        <!-- Retailer Notice Pop-up Modal -->
+        <div id="googleRetailerModal" class="retailer-modal-overlay">
+          <div class="retailer-modal-box">
+            <div style="width:48px;height:48px;border-radius:50%;background:#fee2e2;color:#ef4444;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px">
+              ⚠️
+            </div>
+            <h3 style="font-size:18px;font-weight:800;color:#0f172a;margin-bottom:6px">Enterprise Access Restricted</h3>
+            <div class="retailer-badge-notice">(only available for retailers)</div>
+            <p style="font-size:13px;color:#64748b;line-height:1.55;margin:14px 0 20px">
+              Google Single Sign-On is reserved exclusively for verified enterprise retail partners with active POS/ERP integration.
+            </p>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button id="modalSkipBtn" type="button" class="btn btn-primary" style="width:100%;padding:10px;font-size:13px;font-weight:700">
+                Proceed Directly to Website (Demo Mode) →
+              </button>
+              <button id="closeRetailerModalBtn" type="button" class="btn btn-secondary" style="width:100%;padding:8px;font-size:12px">
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function attachAuthEvents() {
+    const enterApp = (source) => {
+      AppState.isAuthenticated = true;
+      renderApp();
+      toast(source === 'skip' ? '✓ Entered StockSentry Operations Console via Direct Access.' : '✓ Signed in as Store Operations Lead.');
+    };
+
+    const topSkip = document.getElementById('authSkipTopBtn');
+    if (topSkip) topSkip.onclick = () => enterApp('skip');
+
+    const mainSkip = document.getElementById('authSkipMainBtn');
+    if (mainSkip) mainSkip.onclick = () => enterApp('skip');
+
+    const form = document.getElementById('authLoginForm');
+    if (form) {
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        enterApp('signin');
+      };
+    }
+
+    const submitBtn = document.getElementById('authSubmitBtn');
+    if (submitBtn) {
+      submitBtn.onclick = (e) => {
+        e.preventDefault();
+        enterApp('signin');
+      };
+    }
+
+    // Google Sign-In -> triggers retailer notice pop-up
+    const googleBtn = document.getElementById('authGoogleBtn');
+    const modal = document.getElementById('googleRetailerModal');
+    const closeModal = document.getElementById('closeRetailerModalBtn');
+    const modalSkip = document.getElementById('modalSkipBtn');
+
+    if (googleBtn && modal) {
+      googleBtn.onclick = () => {
+        modal.classList.add('active');
+      };
+    }
+
+    if (closeModal && modal) {
+      closeModal.onclick = () => {
+        modal.classList.remove('active');
+      };
+    }
+
+    if (modalSkip && modal) {
+      modalSkip.onclick = () => {
+        modal.classList.remove('active');
+        enterApp('skip');
+      };
+    }
+
+    if (modal) {
+      modal.onclick = (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+        }
+      };
+    }
+
+    // Password visibility toggle
+    const togglePassBtn = document.getElementById('authTogglePasswordBtn');
+    const passInput = document.getElementById('authPassword');
+    if (togglePassBtn && passInput) {
+      togglePassBtn.onclick = () => {
+        const isPass = passInput.type === 'password';
+        passInput.type = isPass ? 'text' : 'password';
+        togglePassBtn.innerHTML = isPass
+          ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>`
+          : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+      };
+    }
   }
 
   // Sidebar Component
@@ -270,6 +578,7 @@
           </div>
 
           <button id="quickExportBtn" class="btn btn-secondary">Export Top 20</button>
+          <button id="signOutBtn" class="btn btn-secondary" style="margin-left:6px;padding:6px 10px;font-size:11px" title="Lock session & return to Login Screen">🔒 Sign Out</button>
         </div>
       </header>
     `;
@@ -2311,6 +2620,16 @@
     [quickExportBtn, exportCsvBtn, downloadQueueCsvBtn].forEach(b => {
       if (b) b.onclick = exportTop20Csv;
     });
+
+    // Sign Out Button (returns to Authentication Portal)
+    const signOutBtn = document.getElementById('signOutBtn');
+    if (signOutBtn) {
+      signOutBtn.onclick = () => {
+        AppState.isAuthenticated = false;
+        renderApp();
+        toast('🔒 Logged out to Authentication Portal.');
+      };
+    }
 
     // Export Audit Logs CSV
     const downloadAuditLogsBtn = document.getElementById('downloadAuditLogsBtn');
