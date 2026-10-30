@@ -1442,3 +1442,17 @@ body {
   .auth-hero-heading { font-size: 32px; }
 }
 
+
+@keyframes pulseDot {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.edge-ai-pill {
+  transition: all 0.2s ease;
+}
+.edge-ai-pill:hover {
+  background: rgba(37, 99, 235, 0.14) !important;
+  transform: translateY(-1px);
+}
