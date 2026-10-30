@@ -10,3 +10,5 @@ data/*.parquet
 data/*.csv
 models/
 .venv/
+.pytest_cache/
+

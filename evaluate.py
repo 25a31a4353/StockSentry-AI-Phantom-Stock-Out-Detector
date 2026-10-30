@@ -1,395 +1,313 @@
 #!/usr/bin/env python3
-"""
-StockSentry AI — Official Competition Evaluation Engine & Parameter Validation Harness (evaluate.py)
------------------------------------------------------------------------------------------------------
-Performs rigorous, reproducible, non-hardcoded empirical evaluation against the R1 Problem Statement:
-- Evaluates Top-K ranking (K = min(20, candidates)) per store-day budget.
-- Evaluates Precision@20 against ~3% hidden ground-truth labels.
-- Evaluates Hidden-Label Recall and F1-Score across all stores.
-- Executes full empirical sweeps for:
-    1. Zero-sales persistence threshold N (N = 2, 3, 4, 5, 6)
-    2. Slow-mover score dampening factor (0%, 25%, 40%, 55%, 70%, 100%)
-    3. Bayesian prior prevalence sensitivity (P0 = 0.5%, 1.0%, 2.0%, 3.0%, 5.0%)
-- Outputs an auditable validation artifact: 'evaluation_report.json'.
-"""
+"""Official scorer for R1 -- The Phantom Stock-Out Detector (TalentAP Mega Hackathon 2026).
 
-import sys
-import os
-import math
-import time
+Usage
+-----
+    python evaluate.py --submission submission/R1_predictions.csv --truth data/dev_truth.csv [--out score.json]
+
+The SAME file is used by the organisers with the hidden test truth.
+Requires only Python >= 3.9, numpy and pandas.
+
+Submission format (CSV, one row per flagged SKU)
+------------------------------------------------
+    date, store_id, sku_id, rank, confidence, reason [, predicted_type]
+* date            YYYY-MM-DD -- the business day the list is for
+* store_id/sku_id ids exactly as in the data files
+* rank            integer 1..20, unique within a (date, store_id) list
+* confidence      number between 0 and 1
+* reason          one-line plain-English reason (text; may not be blank in spirit -- judges read it)
+* predicted_type  OPTIONAL stretch column: phantom | misplaced | delisted (blank allowed)
+At most MAX_PER_STORE_DAY rows per (date, store_id).  No duplicate (date, store_id, sku_id).
+
+Scoring
+-------
+Only (date, store_id) pairs present in the truth file are scored ("store-days" = every date in the truth
+file x every store in the truth file).  Rows for other dates/stores are ignored, so you may submit lists
+for every store and every date.
+
+* primary_score = mean over scored store-days of  hits / K   (K = 20; a list with fewer than 20 rows is
+  still divided by 20; a store-day with no rows scores 0).  Range 0..1, higher is better.
+  A "hit" is a submitted row whose (date, store_id, sku_id) has label_type in POSITIVE_TYPES.
+* row_recall      = hits / all positive rows in the truth
+* episode_recall  = positive episodes flagged on at least one of their days / all positive episodes
+* ceiling         = best possible primary_score for this truth (some store-days have < 20 positives)
+* type_accuracy   = (stretch, only if a predicted_type column is given) among your flagged rows that are
+                    phantom / misplaced / delisted in truth AND have a non-blank predicted_type, the share where
+                    predicted_type equals the true type (blank predicted_type rows are left out)
+"""
+from __future__ import annotations
+
+import argparse
+import csv
+import io
 import json
-import random
-from datetime import datetime, timedelta
+import sys
 
-# Ensure UTF-8 output on Windows consoles
-if sys.platform == 'win32':
+import numpy as np
+import pandas as pd
+
+# ----------------------------------------------------------------------------- constants
+K = 20                                   # manager's daily verification budget per store
+MAX_PER_STORE_DAY = 20                   # more rows than this for one store-day is a format error
+POSITIVE_TYPES = ("phantom", "misplaced")  # counted as hits
+DECOY_TYPES = ("delisted",)              # labelled in truth, but NOT a hit
+VALID_TYPES = POSITIVE_TYPES + DECOY_TYPES
+REQUIRED_COLS = ["date", "store_id", "sku_id", "rank", "confidence", "reason"]
+OPTIONAL_COLS = ["predicted_type"]
+TRUTH_COLS = ["date", "store_id", "sku_id", "label_type", "episode_id"]
+
+
+class FormatError(Exception):
+    pass
+
+
+def _raise_csv_field_limit() -> None:
+    lim = sys.maxsize
+    while True:                       # sys.maxsize overflows a C long on some platforms (Windows)
+        try:
+            csv.field_size_limit(lim)
+            return
+        except OverflowError:
+            lim //= 10
+
+
+_raise_csv_field_limit()
+
+
+def fail(msg: str) -> None:
+    print("\n*** SUBMISSION FORMAT ERROR ***")
+    print(msg)
+    print("\nNothing was scored. Fix the problem above and run evaluate.py again.")
+    sys.exit(2)
+
+
+def _strict_dates(s: pd.Series, what: str) -> pd.Series:
+    s = s.astype(str).str.strip()
+    ok = s.str.fullmatch(r"\d{4}-\d{2}-\d{2}")
+    parsed = pd.to_datetime(s.where(ok), format="%Y-%m-%d", errors="coerce")
+    bad = parsed.isna()
+    if bad.any():
+        ex = s[bad].head(5).tolist()
+        raise FormatError(f"{what}: {int(bad.sum())} value(s) in column 'date' are not valid YYYY-MM-DD dates, "
+                          f"e.g. {ex}. Write dates like 2026-09-03.")
+    return parsed.dt.strftime("%Y-%m-%d")
+
+
+def load_truth(path: str) -> pd.DataFrame:
     try:
-        sys.stdout.reconfigure(encoding='utf-8')
-    except Exception:
-        pass
-
-def build_canonical_evaluation_dataset(stores_count=25, skus_per_store=120, days=30, seed=42):
-    """
-    Builds canonical R1 competition benchmark dataset with ~3% hidden ground truth phantom labels.
-    Includes day-of-week seasonality, promotional lifts, slow/medium/fast velocity tiers,
-    and ground truth failure mechanisms.
-    """
-    random.seed(seed)
-    dataset = []
-    
-    # Store formats
-    formats = ['Hypermarket', 'Supermarket', 'Express Store', 'Daily Mart']
-    categories = ['Beverages', 'Snacks', 'Grocery & Staples', 'Personal Care', 
-                  'Home Care', 'Dairy & Fresh', 'Packaged Food', 'Household Essentials']
-
-    # Master SKU Catalog (800 SKUs distributed across categories)
-    master_skus = []
-    for i in range(800):
-        sku_id = f"SKU-{str(i + 1).zfill(3)}"
-        cat = categories[i % len(categories)]
-        is_slow = (i % 8 == 0)
-        is_fast = (i % 3 == 0) and not is_slow
-        vel_class = 'Slow Mover' if is_slow else ('Fast Mover' if is_fast else 'Medium Mover')
-        base_demand = 0.3 if is_slow else (4.2 if is_fast else 1.9)
-        price = round(55.0 + (i % 50) * 12.5, 2)
-        cost = round(price * 0.70, 2)
-        master_skus.append({
-            'sku_id': sku_id,
-            'category': cat,
-            'velocity_class': vel_class,
-            'base_demand': base_demand,
-            'price': price,
-            'cost': cost,
-            'margin': round(price - cost, 2)
-        })
-
-    today = datetime(2026, 10, 28)
-
-    for s in range(stores_count):
-        store_id = f"S{str(s + 1).zfill(2)}"
-        
-        # Pick 40 SKUs per store
-        store_skus = [master_skus[(s * 23 + k * 13) % len(master_skus)] for k in range(skus_per_store)]
-        
-        # Pre-assign realistic phantom profiles to ~3-5% of SKU-days
-        for d in range(days - 1, -1, -1):
-            cur_date = today - timedelta(days=d)
-            date_str = cur_date.strftime("%Y-%m-%d")
-            is_weekend = cur_date.weekday() in [5, 6]
-            is_promo_day = (d % 7 in [2, 3])
-
-            for k, sku in enumerate(store_skus):
-                is_promo = is_promo_day and (k % 4 == 0)
-                dow_mult = 1.25 if is_weekend else 0.95
-                promo_mult = 1.60 if is_promo else 1.0
-                expected_d = max(0.2, sku['base_demand'] * dow_mult * promo_mult)
-
-                # Inject true hidden phantom labels at ~3% rate
-                # Typical phantom lasts 4-7 days before discovery
-                is_phantom_seed = ((s * 19 + k * 7 + (d // 6) * 11) % 31 < 3)
-                phantom_active = is_phantom_seed and (d % 6 < 4)
-
-                if phantom_active:
-                    units_sold = 0
-                    on_hand = 8 + (k % 15)
-                    hidden_label = 1
-                    failure_mode = 'Confirmed Phantom Stock-Out'
-                else:
-                    hidden_label = 0
-                    failure_mode = 'Normal'
-                    # Normal Poisson-distributed sales
-                    lam = expected_d
-                    # Sample Poisson
-                    units_sold = max(0, int(round(random.gauss(lam, math.sqrt(max(0.1, lam))))))
-                    if units_sold == 0 and sku['velocity_class'] == 'Slow Mover':
-                        on_hand = 6 + (k % 8)
-                    else:
-                        on_hand = max(units_sold + 2, 10 + (k % 12))
-
-                dataset.append({
-                    'date': date_str,
-                    'store_id': store_id,
-                    'sku_id': sku['sku_id'],
-                    'category': sku['category'],
-                    'velocity_class': sku['velocity_class'],
-                    'base_demand': sku['base_demand'],
-                    'price': sku['price'],
-                    'units_sold': units_sold,
-                    'on_hand_qty': on_hand,
-                    'promotion': 1 if is_promo else 0,
-                    'is_phantom_ground_truth': hidden_label,
-                    'failure_mode': failure_mode
-                })
-
-    return dataset
+        t = pd.read_csv(path, dtype=str, keep_default_na=False)
+    except Exception as e:  # noqa: BLE001
+        raise FormatError(f"Could not read truth file '{path}': {type(e).__name__}: {str(e)[:200]}")
+    missing = [c for c in TRUTH_COLS if c not in t.columns]
+    if missing:
+        raise FormatError(f"Truth file '{path}' is missing columns {missing}. Did you pass the submission as --truth?")
+    t["date"] = _strict_dates(t["date"], "truth file")
+    bad = ~t["label_type"].isin(VALID_TYPES)
+    if bad.any():
+        raise FormatError(f"Truth file has unknown label_type values {sorted(t.label_type[bad].unique())[:5]}")
+    return t
 
 
-class AnomalyDetector:
-    """Production Anomaly Scoring Engine with dynamic parameter tuning."""
-    def __init__(self, threshold_n=3, slow_mover_dampening=0.55, prior_p0=0.03):
-        self.threshold_n = threshold_n
-        self.slow_mover_dampening = slow_mover_dampening  # score multiplier = (1 - dampening)
-        self.prior_p0 = prior_p0
-
-    def compute_score(self, record, zero_streak, expected_demand, is_stale):
-        stock = record['on_hand_qty']
-        sales = record['units_sold']
-        is_promo = bool(record['promotion'])
-        is_slow = (record.get('velocity_class') == 'Slow Mover') or (expected_demand < 0.45)
-
-        if stock <= 0:
-            return 0.0
-
-        # Poisson persistence probability shortfall: 1 - e^(-lambda * N)
-        p_zero = math.exp(-expected_demand * zero_streak)
-        persistence = 1.0 - min(1.0, p_zero)
-
-        # Demand gap
-        gap = max(0.0, (expected_demand - sales) / max(expected_demand, 1.0))
-
-        score = 0.0
-        if zero_streak >= 1:
-            score += persistence * 52.0
-
-        if gap > 0.4:
-            score += gap * 28.0
-
-        if is_stale and zero_streak >= 2:
-            score += 12.0
-
-        if is_promo and zero_streak >= 2:
-            score += 10.0
-        elif is_promo and sales > 0:
-            score -= 12.0
-
-        # Slow-mover filter
-        if is_slow:
-            if zero_streak < self.threshold_n + 3:
-                score *= (1.0 - self.slow_mover_dampening)
-            else:
-                score *= 0.85
-
-        # Incorporate Bayesian Prior Weight
-        score *= (1.0 + math.log10(max(0.001, self.prior_p0 / 0.03) + 1.0) * 0.1)
-
-        return max(0.0, min(100.0, score))
+def _read_text(path: str, warnings: list[str]) -> str:
+    try:
+        with open(path, "rb") as f:
+            raw = f.read()
+    except FileNotFoundError:
+        raise FormatError(f"Submission file '{path}' was not found. Check the path "
+                          f"(expected something like submission/R1_predictions.csv).")
+    except IsADirectoryError:
+        raise FormatError(f"'{path}' is a folder, not a file. Pass the CSV itself, e.g. submission/R1_predictions.csv.")
+    except OSError as e:
+        raise FormatError(f"Could not open '{path}': {e}")
+    if b"\x00" in raw[:65536]:
+        raise FormatError(f"'{path}' looks like a binary file (zip/xlsx/parquet?), not a CSV. Save it as CSV (UTF-8).")
+    try:
+        text = raw.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        warnings.append("File is not UTF-8; read it as Windows-1252 (Excel default). Prefer 'CSV UTF-8' when saving.")
+        text = raw.decode("cp1252", errors="replace")
+    return text.replace("\r\n", "\n").replace("\r", "\n")      # old-Mac / mixed line endings
 
 
-def run_evaluation(dataset, threshold_n=3, slow_dampening=0.55, prior_p0=0.03, max_k=20):
-    """
-    Evaluates dataset across all store-days respecting:
-    K = min(max_k, eligible_candidates)
-    Computes empirical Precision@20, Recall, and F1-score.
-    """
-    detector = AnomalyDetector(threshold_n=threshold_n, slow_mover_dampening=slow_dampening, prior_p0=prior_p0)
+def load_submission(path: str) -> tuple[pd.DataFrame, list[str]]:
+    warnings: list[str] = []
+    text = _read_text(path, warnings)
+    try:
+        rows = list(csv.reader(io.StringIO(text)))
+    except csv.Error as e:
+        raise FormatError(f"Could not parse the file as CSV ({e}). Save it as a plain comma-separated UTF-8 file.")
+    rows = [r for r in rows if any(x.strip() for x in r)]
+    if not rows:
+        raise FormatError("The submission file is empty.")
+    n_head = len(rows[0])
+    bad = [i for i, r in enumerate(rows[1:], start=2) if len(r) != n_head]
+    if bad:
+        raise FormatError(f"{len(bad)} line(s) have a different number of fields than the header ({n_head}), first at "
+                          f"line {bad[0]} ({len(rows[bad[0] - 1])} fields). Usually a 'reason' text contains a comma: wrap it "
+                          f"in double quotes (pandas' to_csv does this for you).")
+    try:
+        s = pd.read_csv(io.StringIO(text), dtype=str, keep_default_na=False)
+    except Exception as e:  # noqa: BLE001
+        raise FormatError(f"Could not read '{path}' as CSV: {e}. Save it as a plain comma-separated UTF-8 file.")
+    s.columns = [c.strip().lower() for c in s.columns]
+    missing = [c for c in REQUIRED_COLS if c not in s.columns]
+    if missing:
+        raise FormatError(f"Missing required column(s): {missing}.\nYour columns: {list(s.columns)}\n"
+                          f"Required header: {','.join(REQUIRED_COLS)}  (optional extra column: predicted_type)")
+    extra = [c for c in s.columns if c not in REQUIRED_COLS + OPTIONAL_COLS]
+    if extra:
+        warnings.append(f"Ignoring unknown column(s): {extra}")
+    if len(s) == 0:
+        raise FormatError("The submission has a header but no rows.")
+    s["date"] = _strict_dates(s["date"], "submission")
+    for c in ("store_id", "sku_id"):
+        s[c] = s[c].astype(str).str.strip()
+        blank = s[c] == ""
+        if blank.any():
+            raise FormatError(f"Column '{c}' is blank in {int(blank.sum())} row(s) (first at data row "
+                              f"{int(np.argmax(blank.values)) + 2}).")
+    r = pd.to_numeric(s["rank"].str.strip(), errors="coerce")
+    bad = r.isna() | (r != np.floor(r)) | (r < 1) | (r > MAX_PER_STORE_DAY)
+    if bad.any():
+        ex = s.loc[bad, "rank"].head(5).tolist()
+        raise FormatError(f"Column 'rank' must be a whole number from 1 to {MAX_PER_STORE_DAY}; "
+                          f"{int(bad.sum())} bad value(s), e.g. {ex}.")
+    s["rank"] = r.astype(int)
+    cf = pd.to_numeric(s["confidence"].str.strip(), errors="coerce")
+    bad = cf.isna() | (cf < 0) | (cf > 1)
+    if bad.any():
+        ex = s.loc[bad, "confidence"].head(5).tolist()
+        raise FormatError(f"Column 'confidence' must be a number between 0 and 1; {int(bad.sum())} bad value(s), "
+                          f"e.g. {ex}.")
+    s["confidence"] = cf.astype(float)
+    blank_reason = s["reason"].astype(str).str.strip() == ""
+    if blank_reason.any():
+        warnings.append(f"{int(blank_reason.sum())} row(s) have an empty 'reason' -- the score is unaffected, "
+                        f"but judges expect a one-line plain-English reason for every flag.")
+    if "predicted_type" in s.columns:
+        s["predicted_type"] = s["predicted_type"].astype(str).str.strip().str.lower()
+        bad = ~s["predicted_type"].isin(list(VALID_TYPES) + [""])
+        if bad.any():
+            raise FormatError(f"Column 'predicted_type' may only contain {list(VALID_TYPES)} or be blank; "
+                              f"found {sorted(s.predicted_type[bad].unique())[:5]}.")
+    dup = s.duplicated(["date", "store_id", "sku_id"], keep=False)
+    if dup.any():
+        ex = s.loc[dup, ["date", "store_id", "sku_id"]].head(3).to_dict("records")
+        raise FormatError(f"{int(dup.sum())} rows repeat the same (date, store_id, sku_id). Each SKU may appear at "
+                          f"most once per store-day. Examples: {ex}")
+    n = s.groupby(["date", "store_id"]).size()
+    over = n[n > MAX_PER_STORE_DAY]
+    if len(over):
+        ex = [f"{d} / {st}: {c} rows" for (d, st), c in over.head(3).items()]
+        raise FormatError(f"{len(over)} store-day(s) have more than {MAX_PER_STORE_DAY} rows -- the manager can only "
+                          f"check {MAX_PER_STORE_DAY} SKUs per store per day. Examples: {ex}")
+    rdup = s.duplicated(["date", "store_id", "rank"], keep=False)
+    if rdup.any():
+        ex = s.loc[rdup, ["date", "store_id", "rank"]].head(3).to_dict("records")
+        raise FormatError(f"Ranks must be unique within each (date, store_id) list. Examples of repeats: {ex}")
+    return s, warnings
 
-    # Group by store and SKU to build chronological histories
-    histories = {}
-    for r in dataset:
-        key = (r['store_id'], r['sku_id'])
-        if key not in histories:
-            histories[key] = []
-        histories[key].append(r)
 
-    # Sort each history by date
-    for key in histories:
-        histories[key].sort(key=lambda x: x['date'])
+def score(sub: pd.DataFrame, truth: pd.DataFrame) -> dict:
+    dates = sorted(truth["date"].unique())
+    stores = sorted(truth["store_id"].unique())
+    scope = pd.MultiIndex.from_product([dates, stores], names=["date", "store_id"])
+    pos = truth[truth["label_type"].isin(POSITIVE_TYPES)]
 
-    # Group records by (store_id, date)
-    store_days = {}
-    for r in dataset:
-        sd_key = (r['store_id'], r['date'])
-        if sd_key not in store_days:
-            store_days[sd_key] = []
-        store_days[sd_key].append(r)
+    in_scope = sub.set_index(["date", "store_id"]).index.isin(scope)
+    n_ignored = int((~in_scope).sum())
+    s = sub[in_scope].merge(truth[["date", "store_id", "sku_id", "label_type", "episode_id"]],
+                            on=["date", "store_id", "sku_id"], how="left")
+    s["hit"] = s["label_type"].isin(POSITIVE_TYPES)
 
-    total_tp = 0
-    total_fp = 0
-    total_ground_truth_positives = 0
-    total_audits_performed = 0
-    evaluated_store_days = 0
+    hits = s.groupby(["date", "store_id"])["hit"].sum().reindex(scope, fill_value=0)
+    p_at_k = hits / K
+    sub_sd = s.groupby(["date", "store_id"]).size().reindex(scope, fill_value=0)
+    missing_sd = sub_sd[sub_sd == 0].index.tolist()
+    n_pos_sd = pos.groupby(["date", "store_id"]).size().reindex(scope, fill_value=0)
+    ceiling = float((np.minimum(n_pos_sd, K) / K).mean())
 
-    # Evaluate the most recent 10 days per store (where phantom states are observable)
-    dates = sorted(list(set(r['date'] for r in dataset)))
-    eval_dates = dates[-10:]
-
-    for (store_id, d_str), recs in store_days.items():
-        if d_str not in eval_dates:
-            continue
-
-        evaluated_store_days += 1
-        ground_truth_in_day = sum(1 for r in recs if r['is_phantom_ground_truth'] == 1)
-        total_ground_truth_positives += ground_truth_in_day
-
-        # Candidate eligibility rule:
-        # 1. System records positive on-hand stock
-        # 2. Observed zero checkouts today (units_sold == 0)
-        # 3. Consecutive zero streak meets or exceeds threshold N
-        candidates = []
-        for r in recs:
-            if r['on_hand_qty'] <= 0 or r['units_sold'] > 0:
-                continue
-
-            key = (r['store_id'], r['sku_id'])
-            hist = histories[key]
-            sub_hist = [h for h in hist if h['date'] <= d_str]
-            
-            # Calculate zero streak
-            streak = 0
-            for h in reversed(sub_hist):
-                if h['units_sold'] == 0:
-                    streak += 1
-                else:
-                    break
-
-            if streak < detector.threshold_n:
-                continue
-
-            # Calculate expected demand (recent 14 days prior to streak)
-            prior_sales = [h['units_sold'] for h in sub_hist[:-streak]] if streak < len(sub_hist) else [h['units_sold'] for h in sub_hist]
-            non_zeros = [s for s in prior_sales if s > 0]
-            base_mean = (sum(non_zeros) / len(non_zeros)) if non_zeros else (sum(prior_sales) / max(1, len(prior_sales)))
-            
-            cur_dt = datetime.strptime(d_str, "%Y-%m-%d")
-            dow_m = 1.25 if cur_dt.weekday() in [5, 6] else 0.95
-            p_m = 1.60 if r['promotion'] else 1.0
-            exp_d = round(max(0.2, base_mean * dow_m * p_m), 2)
-
-            recent_stock = [h['on_hand_qty'] for h in sub_hist[-3:]]
-            is_stale = len(recent_stock) >= 3 and len(set(recent_stock)) == 1
-
-            score = detector.compute_score(r, streak, exp_d, is_stale)
-            candidates.append({
-                'record': r,
-                'score': score,
-                'is_phantom': r['is_phantom_ground_truth'],
-                'streak': streak,
-                'expected_demand': exp_d
-            })
-
-        # Rank candidates descending by score
-        candidates.sort(key=lambda x: x['score'], reverse=True)
-
-        # Operational budget: K = min(max_k, len(candidates))
-        k_budget = min(max_k, len(candidates))
-        top_k = candidates[:k_budget]
-        total_audits_performed += k_budget
-
-        day_tp = sum(1 for item in top_k if item['is_phantom'] == 1)
-        day_fp = k_budget - day_tp
-
-        total_tp += day_tp
-        total_fp += day_fp
-
-    precision_at_k = (total_tp / max(1, total_audits_performed)) * 100.0
-    recall = (total_tp / max(1, total_ground_truth_positives)) * 100.0
-    f1 = (2 * precision_at_k * recall) / max(0.001, precision_at_k + recall)
-
-    return {
-        'evaluated_store_days': evaluated_store_days,
-        'total_audits_performed': total_audits_performed,
-        'true_positives': total_tp,
-        'false_positives': total_fp,
-        'ground_truth_positives': total_ground_truth_positives,
-        'precision_at_20': round(precision_at_k, 2),
-        'recall': round(recall, 2),
-        'f1_score': round(f1, 2)
+    total_hits = int(s["hit"].sum())
+    n_pos_rows = len(pos)
+    pos_eps = pos["episode_id"].unique()
+    caught_eps = s.loc[s["hit"], "episode_id"].unique()
+    res = {
+        "primary_score": round(float(p_at_k.mean()), 6),
+        "primary_metric": f"mean precision@{K} per store-day",
+        "n_store_days_scored": int(len(scope)),
+        "n_dates": len(dates),
+        "n_stores": len(stores),
+        "n_store_days_missing": len(missing_sd),
+        "ceiling_precision_at_20": round(ceiling, 6),
+        "primary_score_as_share_of_ceiling": round(float(p_at_k.mean()) / ceiling, 6) if ceiling > 0 else None,
+        "row_recall": round(total_hits / n_pos_rows, 6) if n_pos_rows else None,
+        "episode_recall": round(len(caught_eps) / len(pos_eps), 6) if len(pos_eps) else None,
+        "n_hits": total_hits,
+        "n_positive_rows_in_truth": int(n_pos_rows),
+        "n_positive_episodes_in_truth": int(len(pos_eps)),
+        "n_submitted_rows_scored": int(len(s)),
+        "n_submitted_rows_ignored_out_of_scope": n_ignored,
+        "share_of_flags_on_delisted_decoys": round(float(s["label_type"].isin(DECOY_TYPES).mean()), 6) if len(s) else 0.0,
+        "mean_rows_per_scored_store_day": round(float(sub_sd.mean()), 3),
+        "precision_at_20_by_date": {d: round(float(v), 4) for d, v in p_at_k.groupby(level="date").mean().items()},
+        "precision_at_20_by_store": {st: round(float(v), 4) for st, v in p_at_k.groupby(level="store_id").mean().items()},
+        "_missing_store_days_examples": [f"{d} / {st}" for d, st in missing_sd[:5]],
     }
+    if "predicted_type" in s.columns:
+        typed = s[s["label_type"].isin(VALID_TYPES) & (s["predicted_type"] != "")]
+        res["type_accuracy"] = round(float((typed["predicted_type"] == typed["label_type"]).mean()), 6) if len(typed) else None
+        res["type_accuracy_n_rows"] = int(len(typed))
+        res["type_accuracy_by_true_type"] = {
+            t: round(float((g["predicted_type"] == t).mean()), 4) for t, g in typed.groupby("label_type")}
+    return res
 
 
-def main():
-    start_time = time.time()
-    print("=" * 80)
-    print("STOCKSENTRY AI — OFFICIAL REPRODUCIBLE EVALUATION HARNESS (evaluate.py)")
-    print("Validation against Problem Statement R1 (Precision@20 & Hidden-Label Recall)")
-    print("=" * 80)
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description="Score an R1 Phantom Stock-Out submission.")
+    ap.add_argument("--submission", required=True, help="path to your CSV (e.g. submission/R1_predictions.csv)")
+    ap.add_argument("--truth", required=True, help="truth CSV (data/dev_truth.csv for self-checks)")
+    ap.add_argument("--out", default="score.json", help="where to write the JSON result (default score.json)")
+    a = ap.parse_args(argv)
+    try:
+        truth = load_truth(a.truth)
+        sub, warnings = load_submission(a.submission)
+        res = score(sub, truth)
+    except FormatError as e:
+        fail(str(e))
+    except Exception as e:  # noqa: BLE001  -- never show a traceback to participants
+        fail(f"Unexpected problem while reading or scoring the files ({type(e).__name__}: {str(e)[:300]}). "
+             f"Check that --submission is your CSV and --truth is data/dev_truth.csv, and that the CSV follows the format "
+             f"in README.md.")
 
-    print("\n[1/4] Building Canonical Retail Benchmark Dataset...")
-    dataset = build_canonical_evaluation_dataset(stores_count=25, skus_per_store=120, days=30)
-    total_rows = len(dataset)
-    labeled_rows = sum(1 for r in dataset if r['is_phantom_ground_truth'] == 1)
-    label_pct = (labeled_rows / total_rows) * 100.0
-    print(f"  • Stores: 25 | Catalog SKUs: 800 (Active per Store: 120) | Time Horizon: 30 days")
-    print(f"  • Total Evaluated Observations: {total_rows:,} SKU-days")
-    print(f"  • Ground-Truth Phantom Labels: {labeled_rows:,} ({label_pct:.2f}% base prevalence)")
+    print("=" * 66)
+    print(" R1 Phantom Stock-Out Detector -- evaluation")
+    print("=" * 66)
+    for wmsg in warnings:
+        print(f"WARNING: {wmsg}")
+    if res["n_store_days_missing"]:
+        print(f"WARNING: {res['n_store_days_missing']} of {res['n_store_days_scored']} scored store-days have NO rows "
+              f"in your submission and score 0. First few: {res['_missing_store_days_examples']}")
+    if res["n_submitted_rows_scored"] == 0:
+        print("WARNING: NONE of your rows match a (date, store_id) in the truth file. Check the date format and the "
+              "store_id spelling (e.g. STR-XXXX, upper case) and that you predicted the right window.")
+    if res["n_submitted_rows_ignored_out_of_scope"]:
+        print(f"note: {res['n_submitted_rows_ignored_out_of_scope']} row(s) are for dates/stores not in this truth "
+              f"file and were ignored (that is fine).")
+    print(f"Scored store-days          : {res['n_store_days_scored']} ({res['n_dates']} dates x {res['n_stores']} stores)")
+    print(f"PRIMARY  precision@{K}       : {res['primary_score']:.4f}   (0..1, higher is better)")
+    print(f"  best possible (ceiling)  : {res['ceiling_precision_at_20']:.4f}")
+    print(f"Row recall                 : {res['row_recall']:.4f}  ({res['n_hits']} of {res['n_positive_rows_in_truth']} positive rows)")
+    print(f"Episode recall             : {res['episode_recall']:.4f}  (of {res['n_positive_episodes_in_truth']} positive episodes)")
+    print(f"Flags spent on delisted    : {res['share_of_flags_on_delisted_decoys']:.4f}")
+    if "type_accuracy" in res:
+        ta = res["type_accuracy"]
+        print(f"Stretch type accuracy      : {ta if ta is None else round(ta, 4)}  (n={res['type_accuracy_n_rows']})")
+    res["missing_store_days_examples"] = res.pop("_missing_store_days_examples", [])
+    with open(a.out, "w", encoding="utf-8") as f:
+        json.dump(res, f, indent=2)
+    print(f"Wrote {a.out}")
+    return 0
 
-    # Baseline Run with default configuration
-    print("\n[2/4] Executing Primary Competition Benchmark (N=3, Slow Mover Dampening=55%, Prior=3.0%)...")
-    t0 = time.time()
-    base_res = run_evaluation(dataset, threshold_n=3, slow_dampening=0.55, prior_p0=0.03, max_k=20)
-    t_elapsed_ms = (time.time() - t0) * 1000.0
 
-    print(f"  [+] Store-Days Evaluated: {base_res['evaluated_store_days']}")
-    print(f"  [+] Total Top-20 Audits Dispatched: {base_res['total_audits_performed']} audits (Respects K=min(20, candidates))")
-    print(f"  [+] True Positives Captured: {base_res['true_positives']} | False Positives: {base_res['false_positives']}")
-    print(f"  [+] Official Precision@20: {base_res['precision_at_20']}%")
-    print(f"  [+] Hidden-Label Recall: {base_res['recall']}%")
-    print(f"  [+] Balanced F1-Score: {base_res['f1_score']}%")
-    print(f"  [+] Execution Latency: {t_elapsed_ms:.1f} ms ({t_elapsed_ms / base_res['evaluated_store_days']:.2f} ms/store-day)")
-
-    # 1. Parameter Sweep: Threshold N
-    print("\n[3/4] Performing Sensitivity Sweep 1: Zero-Sales Persistence Threshold N (Days)")
-    print("-" * 75)
-    print(f"{'Threshold N':<14} | {'Precision@20':<15} | {'Recall':<15} | {'F1-Score':<15} | {'Verdict'}")
-    print("-" * 75)
-    sweep_n_results = []
-    for n_val in [2, 3, 4, 5, 6]:
-        r = run_evaluation(dataset, threshold_n=n_val, slow_dampening=0.55, prior_p0=0.03)
-        verdict = "Optimal Balance" if n_val == 3 else ("High Precision, Lower Recall" if n_val >= 5 else "High Recall, Higher False Positives")
-        print(f"N = {n_val:<10} | {r['precision_at_20']:>6.2f}%         | {r['recall']:>6.2f}%         | {r['f1_score']:>6.2f}%         | {verdict}")
-        sweep_n_results.append({'N': n_val, **r})
-
-    # 2. Parameter Sweep: Slow Mover Dampening
-    print("\n[4/4] Performing Sensitivity Sweep 2: Slow-Mover Score Dampening Factor (%)")
-    print("Justification of 55% filter (why 55% was selected over 0%, 25%, 40%, 70%)")
-    print("-" * 75)
-    print(f"{'Dampening':<14} | {'Precision@20':<15} | {'Recall':<15} | {'F1-Score':<15} | {'Engineering Rationale'}")
-    print("-" * 75)
-    sweep_damp_results = []
-    for damp in [0.0, 0.25, 0.40, 0.55, 0.70, 0.90]:
-        r = run_evaluation(dataset, threshold_n=3, slow_dampening=damp, prior_p0=0.03)
-        rat = "Selected Sweet-Spot" if damp == 0.55 else ("Unmitigated False Positives" if damp == 0.0 else ("Under-dampened" if damp < 0.55 else "Over-penalizes legitimate phantoms"))
-        print(f"{int(damp*100):>3}% dampening   | {r['precision_at_20']:>6.2f}%         | {r['recall']:>6.2f}%         | {r['f1_score']:>6.2f}%         | {rat}")
-        sweep_damp_results.append({'dampening_pct': int(damp * 100), **r})
-
-    # 3. Sensitivity Sweep: Bayesian Prior Base Rate P0
-    print("\n[Bonus] Sensitivity Sweep 3: Prior Phantom Prevalence P0")
-    print("-" * 75)
-    print(f"{'Prior P0':<14} | {'Precision@20':<15} | {'Recall':<15} | {'F1-Score':<15} | {'Interpretation'}")
-    print("-" * 75)
-    sweep_p0_results = []
-    for p0 in [0.005, 0.01, 0.02, 0.03, 0.05]:
-        r = run_evaluation(dataset, threshold_n=3, slow_dampening=0.55, prior_p0=p0)
-        interp = "Standard ~3% Calibration" if p0 == 0.03 else ("Conservative Lower Bound" if p0 < 0.03 else "Elevated Shrinkage Environment")
-        print(f"P0 = {p0*100:>4.1f}%       | {r['precision_at_20']:>6.2f}%         | {r['recall']:>6.2f}%         | {r['f1_score']:>6.2f}%         | {interp}")
-        sweep_p0_results.append({'prior_p0': p0, **r})
-
-    # Write auditable evaluation artifact
-    report = {
-        'timestamp': datetime.now().isoformat(),
-        'dataset_summary': {
-            'stores': 25,
-            'skus_catalog': 800,
-            'skus_sampled_per_store': 40,
-            'total_rows': total_rows,
-            'labeled_rows': labeled_rows,
-            'base_prevalence_pct': round(label_pct, 2)
-        },
-        'primary_benchmark': base_res,
-        'sweep_threshold_n': sweep_n_results,
-        'sweep_slow_mover_dampening': sweep_damp_results,
-        'sweep_prior_p0': sweep_p0_results,
-        'total_runtime_seconds': round(time.time() - start_time, 3)
-    }
-
-    report_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'evaluation_report.json')
-    with open(report_path, 'w', encoding='utf-8') as f:
-        json.dump(report, f, indent=2)
-
-    print("\n" + "=" * 80)
-    print(f"[OK] EVALUATION COMPLETE — Report saved to: {report_path}")
-    print(f"[OK] Total Runtime: {report['total_runtime_seconds']}s")
-    print("=" * 80)
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    sys.exit(main())

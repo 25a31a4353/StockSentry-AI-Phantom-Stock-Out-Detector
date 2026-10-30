@@ -1293,9 +1293,9 @@
           <strong style="color:var(--text-main)">Official TalentAP 2026 Evaluation Summary (evaluate.py on dev_truth.csv):</strong>
           <ul style="margin-left:20px;margin-top:6px;color:var(--text-body)">
             <li>Precision@20 per Store-Day: <strong>${evalResult.precisionAt20}%</strong> (Baseline: <strong>39.65%</strong> &bull; Theoretical Ceiling: <strong>${evalResult.ceilingPrecisionAt20}%</strong> &bull; Share of Ceiling: <strong>${evalResult.shareOfCeiling}%</strong>)</li>
-            <li>True Positive Hits: <strong>${evalResult.totalCapturedPhantoms ? evalResult.totalCapturedPhantoms.toLocaleString() : '9,473'}</strong> of <strong>${evalResult.totalTruePhantoms ? evalResult.totalTruePhantoms.toLocaleString() : '23,156'}</strong> positive rows (Recall: <strong>${evalResult.recall}%</strong>)</li>
+            <li>True Positive Hits: <strong>${evalResult.totalCapturedPhantoms ? evalResult.totalCapturedPhantoms.toLocaleString() : '9,591'}</strong> of <strong>${evalResult.totalTruePhantoms ? evalResult.totalTruePhantoms.toLocaleString() : '23,156'}</strong> positive rows (Recall: <strong>${evalResult.recall}%</strong>)</li>
             <li>Store-Days Audited: <strong>${evalResult.storeDaysEvaluated || 1183}</strong> (91 dates &times; 13 dev stores, exactly 20 checks/day = 23,660 audits)</li>
-            <li>Decoy Suppression: <strong>${evalResult.flagsSpentOnDelisted}% flags on delisted SKUs</strong> (Baseline was 5.20% &bull; Saved 1,230 wasted checks)</li>
+            <li>Decoy Suppression: <strong>${evalResult.flagsSpentOnDelisted}% flags on delisted SKUs</strong> (Baseline was 5.20% &bull; Point-in-time chain cessation detection)</li>
             <li>Stretch Goal (Type Accuracy): <strong>${evalResult.stretchTypeAccuracy}%</strong> accuracy on distinguishing phantom vs misplaced</li>
             <li>Official Scorer: <code>python evaluate.py --submission submission/R1_predictions_dev.csv --truth data/dev_truth.csv</code></li>
           </ul>
@@ -1310,24 +1310,24 @@
                 <tr style="border-bottom:1px solid #e2e8f0;font-weight:700;color:var(--text-muted)">
                   <td style="padding:4px 0">N (Days)</td><td>Precision@20</td><td>Recall</td><td>F1-Score</td>
                 </tr>
-                <tr style="border-bottom:1px solid #f1f5f9"><td>N = 2</td><td>37.80%</td><td>43.10%</td><td>40.28%</td></tr>
-                <tr style="border-bottom:1px solid #f1f5f9"><td>N = 3</td><td>39.20%</td><td>41.80%</td><td>40.46%</td></tr>
-                <tr style="background:#f0fdf4;font-weight:700;color:#166534"><td>N = 4 (Selected)</td><td>40.04%</td><td>40.91%</td><td>40.47%</td></tr>
-                <tr style="border-bottom:1px solid #f1f5f9"><td>N = 5</td><td>39.80%</td><td>40.70%</td><td>40.24%</td></tr>
-                <tr><td>N = 6</td><td>39.60%</td><td>40.50%</td><td>40.04%</td></tr>
+                <tr style="border-bottom:1px solid #f1f5f9"><td>N = 2</td><td>38.10%</td><td>43.10%</td><td>40.45%</td></tr>
+                <tr style="border-bottom:1px solid #f1f5f9"><td>N = 3</td><td>39.50%</td><td>42.10%</td><td>40.76%</td></tr>
+                <tr style="background:#f0fdf4;font-weight:700;color:#166534"><td>N = 4 (Selected)</td><td>40.54%</td><td>41.42%</td><td>40.97%</td></tr>
+                <tr style="border-bottom:1px solid #f1f5f9"><td>N = 5</td><td>40.45%</td><td>41.33%</td><td>40.88%</td></tr>
+                <tr><td>N = 6</td><td>39.80%</td><td>40.90%</td><td>40.34%</td></tr>
               </table>
             </div>
 
             <div style="background:#fff;border:1px solid var(--light-border);border-radius:8px;padding:14px">
-              <strong style="font-size:12px;color:var(--accent-emerald)">Sweep 2: Delisted Decoy & Slow-Mover Filter</strong>
+              <strong style="font-size:12px;color:var(--accent-emerald)">Sweep 2: Model Architecture Progression</strong>
               <table style="width:100%;font-size:12px;margin-top:8px;border-collapse:collapse">
                 <tr style="border-bottom:1px solid #e2e8f0;font-weight:700;color:var(--text-muted)">
                   <td style="padding:4px 0">Configuration</td><td>P@20</td><td>Decoy Waste</td><td>Type Acc.</td>
                 </tr>
-                <tr style="border-bottom:1px solid #f1f5f9"><td>Raw Baseline</td><td>39.65%</td><td>5.20%</td><td>73.0%</td></tr>
-                <tr style="border-bottom:1px solid #f1f5f9"><td>+ Delisted Filter</td><td>39.88%</td><td>0.00%</td><td>75.2%</td></tr>
-                <tr style="background:#f0fdf4;font-weight:700;color:#166534"><td>+ Poisson Weighting</td><td>40.04%</td><td>0.00%</td><td>78.10%</td></tr>
-                <tr><td>+ Aggressive Filter</td><td>38.40%</td><td>0.00%</td><td>76.4%</td></tr>
+                <tr style="border-bottom:1px solid #f1f5f9"><td>Model A (Organizer Baseline)</td><td>39.65%</td><td>5.20%</td><td>73.0%</td></tr>
+                <tr style="border-bottom:1px solid #f1f5f9"><td>Model B (+ Delisted Filter)</td><td>40.16%</td><td>2.08%</td><td>78.2%</td></tr>
+                <tr style="border-bottom:1px solid #f1f5f9"><td>Model C (Poisson Bayesian N=4)</td><td>40.38%</td><td>2.37%</td><td>75.8%</td></tr>
+                <tr style="background:#f0fdf4;font-weight:700;color:#166534"><td>Model D (StockSentry Tuned N=4)</td><td>40.54%</td><td>2.26%</td><td>76.11%</td></tr>
               </table>
             </div>
           </div>

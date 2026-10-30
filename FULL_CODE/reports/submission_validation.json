@@ -1,0 +1,38 @@
+{
+  "file_name": "R1_predictions.csv",
+  "row_count": 14000,
+  "columns": [
+    "date",
+    "store_id",
+    "sku_id",
+    "rank",
+    "confidence",
+    "reason",
+    "predicted_type"
+  ],
+  "is_valid": true,
+  "errors": [],
+  "warnings": [],
+  "date_range": [
+    "2026-09-03",
+    "2026-09-30"
+  ],
+  "n_unique_dates": 28,
+  "n_unique_stores": 25,
+  "n_store_days": 700,
+  "max_rows_per_store_day": 20,
+  "rank_range": [
+    1,
+    20
+  ],
+  "confidence_range": [
+    0.5941,
+    0.99
+  ],
+  "blank_reasons_count": 0,
+  "has_predicted_type": true,
+  "predicted_type_distribution": {
+    "phantom": 13903,
+    "misplaced": 97
+  }
+}

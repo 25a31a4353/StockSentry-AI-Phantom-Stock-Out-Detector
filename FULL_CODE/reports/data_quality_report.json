@@ -1,0 +1,78 @@
+{
+  "parquet_row_count": 7970112,
+  "date_min": "2025-04-01 00:00:00",
+  "date_max": "2026-09-30 00:00:00",
+  "n_unique_dates": 548,
+  "n_unique_stores": 25,
+  "n_unique_skus": 800,
+  "n_series": 14544,
+  "missing_on_hand": 4987,
+  "missing_sales": 0,
+  "promo_true_count": 1034623,
+  "duplicate_keys": 0,
+  "stores_in_master": 25,
+  "store_splits": {
+    "dev_labelled": 13,
+    "test_hidden": 12
+  },
+  "store_formats": {
+    "Hyper": 9,
+    "Market": 9,
+    "Express": 7
+  },
+  "store_city_tiers": {
+    "1": 13,
+    "2": 8,
+    "3": 4
+  },
+  "skus_in_master": 800,
+  "sku_categories": {
+    "Staples": 156,
+    "Personal Care": 133,
+    "Packaged Foods": 119,
+    "Home Care": 75,
+    "Beverages": 59,
+    "Spices & Masalas": 58,
+    "General Merchandise": 46,
+    "Chocolates & Sweets": 32,
+    "Dairy & Frozen": 31,
+    "Dry Fruits & Nuts": 30,
+    "Health & Wellness": 21,
+    "Baby Care": 20,
+    "Puja & Festive": 20
+  },
+  "sku_price_median": 0.0,
+  "dev_truth_rows": 24639,
+  "dev_truth_types": {
+    "phantom": 17618,
+    "misplaced": 5538,
+    "delisted": 1483
+  },
+  "dev_truth_dates": [
+    "2026-06-04",
+    "2026-09-02"
+  ],
+  "dev_truth_stores": [
+    "STR-06EU",
+    "STR-BFPW",
+    "STR-C6U5",
+    "STR-D7PR",
+    "STR-ENID",
+    "STR-FYR2",
+    "STR-H5GD",
+    "STR-H7AO",
+    "STR-I2FU",
+    "STR-JM18",
+    "STR-QN4Q",
+    "STR-R1W7",
+    "STR-TM3Z"
+  ],
+  "dev_labels_episodes": 2905,
+  "dev_labels_types": {
+    "phantom": 2039,
+    "misplaced": 829,
+    "delisted": 37
+  },
+  "promo_calendar_rows": 1789,
+  "holiday_calendar_rows": 27
+}

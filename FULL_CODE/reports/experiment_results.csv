@@ -1,0 +1,10 @@
+experiment_name,model_type,n_min_run,p0,alpha,slow_pen,promo_weight,precision_at_20,ceiling_precision_at_20,share_of_ceiling,row_recall,episode_recall,share_of_flags_on_delisted,type_accuracy,n_hits,runtime_seconds
+Model A (Organizer Baseline),baseline,7,0.03,1.0,1.0,0.0,0.396492,0.865596,0.458057,0.405122,0.199093,0.052029,0.729928,9381,3.2
+Model B (Baseline + Delisted Filter),baseline_delisted,7,0.03,1.0,1.0,0.0,0.401564,0.865596,0.463916,0.410304,0.203278,0.020837,0.782369,9501,4.15
+Model B2 (Delisted Filter N=5),baseline_delisted,5,0.03,1.0,1.0,0.0,0.403001,0.865596,0.465576,0.411772,0.207113,0.023035,0.76498,9535,3.93
+Model B3 (Delisted Filter N=4),baseline_delisted,4,0.03,1.0,1.0,0.0,0.403762,0.865596,0.466455,0.41255,0.208508,0.023669,0.75843,9553,14.48
+Model C (Poisson Bayesian N=4),poisson_bayesian,4,0.03,0.85,1.0,0.0,0.403762,0.865596,0.466455,0.41255,0.208508,0.023669,0.75843,9553,21.51
+Model D (Poisson + Promo N=4),poisson_dow_promo,4,0.03,0.85,1.0,0.3,0.404818,0.865596,0.467676,0.413629,0.209902,0.023626,0.758508,9578,17.98
+Model E (StockSentry Hybrid N=4),stocksentry_hybrid,4,0.03,0.85,0.45,0.3,0.393449,0.865596,0.454541,0.402012,0.209205,0.023922,0.749165,9309,17.93
+Model E2 (StockSentry Hybrid N=3),stocksentry_hybrid,3,0.03,0.85,0.45,0.3,0.391801,0.865596,0.452637,0.400328,0.2106,0.024345,0.746699,9270,16.51
+Model E3 (StockSentry Hybrid N=5),stocksentry_hybrid,5,0.03,0.85,0.45,0.3,0.393829,0.865596,0.45498,0.402401,0.207113,0.023119,0.757121,9318,6.43

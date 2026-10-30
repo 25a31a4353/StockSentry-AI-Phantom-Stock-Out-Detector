@@ -1,38 +1,15 @@
 {
-  "timestamp": "2026-10-30T13:10:00.000000",
-  "evaluation_engine": "official_evaluate.py (TalentAP Mega Hackathon 2026 Official Scorer)",
-  "dataset_summary": {
-    "evaluation_dates": 91,
-    "evaluation_stores": 13,
-    "total_store_days_scored": 1183,
-    "total_rows_in_truth": 24639,
-    "total_positive_rows_in_truth": 23156,
-    "total_positive_episodes_in_truth": 2868
-  },
-  "official_metrics": {
-    "primary_score": 0.40038,
-    "primary_metric": "mean precision@20 per store-day",
-    "precision_at_20_percent": 40.04,
-    "ceiling_precision_at_20": 0.865596,
-    "share_of_ceiling_percent": 46.25,
-    "row_recall": 0.409095,
-    "row_recall_percent": 40.91,
-    "episode_recall": 0.212692,
-    "episode_recall_percent": 21.27,
-    "total_hits": 9473,
-    "total_submitted_rows_scored": 23660,
-    "share_of_flags_on_delisted_decoys": 0.0000,
-    "stretch_type_accuracy": 0.780956,
-    "stretch_type_accuracy_percent": 78.10
-  },
-  "benchmark_comparison": {
-    "organizer_baseline_precision_at_20": 0.3965,
-    "stocksentry_ai_precision_at_20": 0.4004,
-    "improvement_over_baseline": "+0.39%",
-    "organizer_baseline_decoy_waste": 0.0520,
-    "stocksentry_ai_decoy_waste": 0.0000,
-    "decoy_waste_reduction": "-100% (eliminated all delisted flags)",
-    "organizer_baseline_type_accuracy": 0.7300,
-    "stocksentry_ai_type_accuracy": 0.7810
-  }
+  "status": "success",
+  "timestamp": "2026-10-30T15:56:45+0530",
+  "primaryMetric": "Mean Precision@20 per Store-Day",
+  "precisionAt20": 0.405495,
+  "ceilingPrecisionAt20": 0.865596,
+  "shareOfCeiling": 0.468457,
+  "rowRecall": 0.41432,
+  "episodeRecall": 0.209554,
+  "delistedDecoyShare": 0.022612,
+  "typeAccuracy": 0.761477,
+  "totalStoreDaysScored": 1183,
+  "totalHits": 9594,
+  "totalPositiveRowsInTruth": 23156
 }
