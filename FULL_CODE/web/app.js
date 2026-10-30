@@ -250,7 +250,9 @@
 
           <div class="auth-stats-bar">
             <div class="auth-stat-col">
-              <span class="auth-stat-icon">📊</span>
+              <span class="auth-stat-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
+              </span>
               <div>
                 <span class="auth-stat-num">800</span>
                 <span class="auth-stat-label">Total SKUs</span>
@@ -258,7 +260,9 @@
             </div>
             <div class="auth-stat-divider"></div>
             <div class="auth-stat-col">
-              <span class="auth-stat-icon">🏪</span>
+              <span class="auth-stat-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path><path d="M2 7h20"></path></svg>
+              </span>
               <div>
                 <span class="auth-stat-num">25</span>
                 <span class="auth-stat-label">Stores</span>
@@ -266,7 +270,9 @@
             </div>
             <div class="auth-stat-divider"></div>
             <div class="auth-stat-col">
-              <span class="auth-stat-icon">📅</span>
+              <span class="auth-stat-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              </span>
               <div>
                 <span class="auth-stat-num">18 Months</span>
                 <span class="auth-stat-label">Daily Sales Data</span>
@@ -281,8 +287,12 @@
             <button id="authSkipTopBtn" class="auth-skip-pill" type="button" title="Directly open website dashboard">
               (skip)
             </button>
-            <div class="auth-icon-btn" title="Toggle theme">🌙</div>
-            <div class="auth-lang-pill">🌐 English ▾</div>
+            <div class="auth-icon-btn" title="Toggle theme">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </div>
+            <div class="auth-lang-pill">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>English ▾
+            </div>
           </div>
 
           <div class="auth-card">
@@ -338,7 +348,7 @@
               </button>
 
               <button id="authSkipMainBtn" type="button" class="auth-skip-main-btn" title="Skip authentication and enter dashboard">
-                ⚡ (skip) Go Directly to Website →
+                (skip) Go Directly to Console →
               </button>
             </form>
 
@@ -369,8 +379,8 @@
         <!-- Retailer Notice Pop-up Modal -->
         <div id="googleRetailerModal" class="retailer-modal-overlay">
           <div class="retailer-modal-box">
-            <div style="width:48px;height:48px;border-radius:50%;background:#fee2e2;color:#ef4444;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px">
-              ⚠️
+            <div style="width:48px;height:48px;border-radius:50%;background:#fee2e2;color:#ef4444;display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             </div>
             <h3 style="font-size:18px;font-weight:800;color:#0f172a;margin-bottom:6px">Enterprise Access Restricted</h3>
             <div class="retailer-badge-notice">(only available for retailers)</div>
@@ -429,7 +439,7 @@
     if (googleBtn && modal) {
       googleBtn.onclick = () => {
         modal.classList.add('active');
-        toast('⚠️ (only available for retailers) — Click (skip) to enter demo.');
+        toast('[Access Notice] Google SSO is restricted to verified retail accounts. Click (skip) to enter demo.');
       };
     }
 
@@ -476,17 +486,17 @@
       { id: 'investigate', icon: '⌕', label: 'SKU Investigation', group: 'Operations' },
       { id: 'verification', icon: '✓', label: 'Physical Verification', group: 'Operations' },
       { id: 'feedback', icon: '↶', label: 'Feedback & Learning', group: 'Operations', badge: 'SQLite' },
-      { id: 'store_analysis', icon: '🏪', label: 'Store Analysis', group: 'Intelligence' },
-      { id: 'all_stores', icon: '🌐', label: 'All Stores Network', group: 'Intelligence' },
-      { id: 'trends', icon: '📈', label: 'Anomaly Trends', group: 'Intelligence' },
-      { id: 'impact', icon: '💰', label: 'Rupee Recovery (ROI)', group: 'Intelligence' },
-      { id: 'data_integration', icon: '🔌', label: 'Store Data Integration', group: 'Data & Engine', badge: 'Visual Guide' },
-      { id: 'evaluator', icon: '⚖', label: 'evaluate.py Benchmark', group: 'Data & Engine' },
-      { id: 'simulator', icon: '🔬', label: 'Synthetic Studio', group: 'Data & Engine', badge: '7 Modes' },
+      { id: 'store_analysis', icon: '⌂', label: 'Store Analysis', group: 'Intelligence' },
+      { id: 'all_stores', icon: '◎', label: 'All Stores Network', group: 'Intelligence' },
+      { id: 'trends', icon: '↗', label: 'Anomaly Trends', group: 'Intelligence' },
+      { id: 'impact', icon: '₹', label: 'Rupee Recovery (ROI)', group: 'Intelligence' },
+      { id: 'data_integration', icon: '⇄', label: 'Store Data Integration', group: 'Data & Engine', badge: 'Visual Guide' },
+      { id: 'evaluator', icon: '⌖', label: 'evaluate.py Benchmark', group: 'Data & Engine' },
+      { id: 'simulator', icon: '⌬', label: 'Synthetic Studio', group: 'Data & Engine', badge: '7 Modes' },
       { id: 'data_health', icon: '◉', label: 'Data & Model Health', group: 'Data & Engine' },
       { id: 'reports', icon: '▤', label: 'Reports & Export', group: 'Administration' },
-      { id: 'settings', icon: '⚙', label: 'Settings & AI Models', group: 'Administration' },
-      { id: 'help', icon: '❓', label: 'Help & Knowledge Base', group: 'Administration' }
+      { id: 'settings', icon: '⚙︎', label: 'Settings & AI Models', group: 'Administration' },
+      { id: 'help', icon: 'ℹ', label: 'Help & Knowledge Base', group: 'Administration' }
     ];
 
     let currentGroup = '';
@@ -576,8 +586,9 @@
           </div>
 
           <button id="quickExportBtn" class="btn btn-secondary">Export Top 20</button>
-          <button id="signOutBtn" class="btn btn-secondary" style="margin-left:6px;padding:6px 12px;font-size:12px;display:inline-flex;align-items:center;gap:5px" title="Lock session & return to Landing/Login Screen">
-            <span>🔒</span> Sign Out
+          <button id="signOutBtn" class="btn btn-secondary" style="margin-left:6px;padding:6px 12px;font-size:12px;display:inline-flex;align-items:center;gap:6px" title="Lock session & return to Landing/Login Screen">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>Sign Out</span>
           </button>
         </div>
       </header>
@@ -939,7 +950,7 @@
           ` : `
             <button class="btn btn-emerald" data-verify-sku="${currentItem.sku_id}|${currentItem.store_id}">Start Physical Verification</button>
           `}
-          <button id="runAiDiagnosticBtn" class="btn btn-primary">⚡ Generate AI Diagnostic</button>
+          <button id="runAiDiagnosticBtn" class="btn btn-primary">Generate AI Diagnostic</button>
         </div>
       </div>
 
@@ -1125,7 +1136,10 @@
               <label style="display:block;font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px">BARCODE SCANNER SIMULATION</label>
               <div style="display:flex;gap:8px">
                 <input class="form-input" style="flex:1" value="BARCODE-${item.sku_id.replace('SKU-', '890123')}" readonly>
-                <button id="simulateScanBtn" class="btn btn-secondary">📷 Scan Barcode</button>
+                <button id="simulateScanBtn" class="btn btn-secondary" style="display:inline-flex;align-items:center;gap:5px">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><line x1="7" y1="12" x2="17" y2="12"></line></svg>
+                  <span>Scan Barcode</span>
+                </button>
               </div>
             </div>
 
@@ -1302,7 +1316,7 @@
                       </td>
                       <td>
                         <span class="metric-badge ${f.erpStatus === 'SYNCED_TO_ERP' ? 'badge-emerald' : 'badge-amber'}" style="font-size:10px">
-                          ${f.erpStatus === 'SYNCED_TO_ERP' ? '✓ SYNCED_TO_ERP' : '⏳ PENDING_ERP'}
+                          ${f.erpStatus === 'SYNCED_TO_ERP' ? '✓ SYNCED_TO_ERP' : '• PENDING_ERP'}
                         </span>
                       </td>
                       <td style="color:var(--text-secondary);font-size:12px;max-width:240px;white-space:normal">
@@ -1627,7 +1641,7 @@
           <h2>evaluate.py Metric Engine</h2>
           <p>Runs exact official scoring: <strong>precision@20 per store-day</strong> and <strong>recall on ~3% hidden labels</strong>, coupled with dynamic live audit learning.</p>
         </div>
-        <button id="runBenchmarkBtn" class="btn btn-primary">⚡ Re-Run Evaluation</button>
+        <button id="runBenchmarkBtn" class="btn btn-primary">Re-Run Evaluation</button>
       </div>
 
       <div class="metrics-row">
@@ -1793,7 +1807,7 @@
             </div>
 
             <button id="generateDatasetBtn" class="btn btn-emerald" style="margin-top:10px">
-              ⚡ Generate & Load Synthetic Dataset
+              Generate &amp; Load Synthetic Dataset
             </button>
           </div>
         </div>
@@ -1845,7 +1859,7 @@
         </div>
         <div style="display:flex;gap:10px">
           <button id="downloadSampleCsvBtn" class="btn btn-secondary">Download CSV Template</button>
-          <button id="loadSampleStoreBtn" class="btn btn-emerald">⚡ Load 2,000-Row Sample Store Data</button>
+          <button id="loadSampleStoreBtn" class="btn btn-emerald">Load 2,000-Row Sample Store Data</button>
         </div>
       </div>
 
@@ -1919,7 +1933,7 @@
               <strong>Endpoints:</strong> <code>POST /api/ingest</code> &amp; <code>POST /api/verify</code>
             </div>
             <div style="margin-top:auto">
-              <button id="testApiPingBtn" class="btn btn-secondary" style="width:100%">⚡ Test ERP API Ping &amp; Webhook</button>
+              <button id="testApiPingBtn" class="btn btn-secondary" style="width:100%">Test ERP API Ping &amp; Webhook</button>
             </div>
           </div>
         </div>
@@ -1940,19 +1954,22 @@
               <strong>Columns:</strong> <code>date</code>, <code>store_id</code>, <code>sku_id</code>, <code>units_sold</code>, <code>on_hand_eod</code>.
             </div>
             <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
-              <label for="integrationFolderInput" class="btn btn-emerald" style="width:100%;display:inline-block;text-align:center;cursor:pointer">
-                📂 Upload Whole Folder (Batch Drop)
+              <label for="integrationFolderInput" class="btn btn-emerald" style="width:100%;display:inline-flex;align-items:center;justify-content:center;gap:7px;cursor:pointer">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg>
+                <span>Upload Whole Folder (Batch Drop)</span>
               </label>
               <input type="file" id="integrationFolderInput" webkitdirectory directory multiple style="display:none" />
 
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                <label for="integrationCsvFile" class="btn btn-secondary" style="display:inline-block;text-align:center;cursor:pointer;font-size:12px;padding:8px">
-                  📁 Single CSV/Excel
+                <label for="integrationCsvFile" class="btn btn-secondary" style="display:inline-flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;font-size:12px;padding:8px">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path></svg>
+                  <span>Single CSV/Excel</span>
                 </label>
                 <input type="file" id="integrationCsvFile" accept=".csv,.tsv,.txt,.xlsx,.xls" style="display:none" />
 
-                <label for="integrationBatchInput" class="btn btn-secondary" style="display:inline-block;text-align:center;cursor:pointer;font-size:12px;padding:8px">
-                  📑 Multi-File Batch
+                <label for="integrationBatchInput" class="btn btn-secondary" style="display:inline-flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;font-size:12px;padding:8px">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+                  <span>Multi-File Batch</span>
                 </label>
                 <input type="file" id="integrationBatchInput" multiple accept=".csv,.tsv,.txt,.xlsx,.xls" style="display:none" />
               </div>
@@ -1998,7 +2015,7 @@
         ${AppState.customDataset ? `
           <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
             <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:18px">⚠️</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
               <div style="font-size:13px;color:#92400e">
                 <strong>Custom Dataset Currently Active:</strong> Decision engine is generating all outputs exclusively on <strong>${AppState.customDataset.length.toLocaleString()} uploaded rows</strong> across <strong>${getAvailableStores().length} stores</strong>. Official jury data remains preserved.
               </div>
@@ -2008,7 +2025,9 @@
         ` : ''}
 
         <div id="csvDropZone" class="dropzone-box" style="cursor:pointer">
-          <div style="font-size:36px;margin-bottom:8px">📥</div>
+          <div style="display:flex;justify-content:center;margin-bottom:12px">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          </div>
           <strong style="font-size:15px;color:var(--text-main);display:block;margin-bottom:6px">
             Drag and drop a Whole Folder or Batch of POS CSV / Excel files here
           </strong>
@@ -2206,7 +2225,7 @@
             </div>
           </div>
           <button id="runEdgeAiDiagnosticTestBtn" class="btn btn-secondary" style="font-size:11px;padding:6px 12px;display:inline-flex;align-items:center;gap:6px">
-            <span>⚡</span> Run Neural Engine Self-Check
+            Run Neural Engine Self-Check
           </button>
         </div>
 
@@ -2408,7 +2427,7 @@
           <div class="copilot-title">
             <img src="assets/stocksentry_shield_icon.png" alt="Copilot" style="width:18px;height:18px;object-fit:contain;flex-shrink:0" />
             <span>StockSentry Copilot</span>
-            <span class="copilot-status-pill">${isMin ? '⚡ Edge' : '⚡ Zero-Config Active'}</span>
+            <span class="copilot-status-pill">${isMin ? '● Edge' : '● Zero-Config Active'}</span>
           </div>
           <button id="toggleCopilotBtn" class="copilot-toggle-btn">
             ${isMin ? '▲ Expand' : '▼ Minimize'}
@@ -2425,12 +2444,12 @@
           </div>
 
           <div style="padding:6px 12px;background:#f8fafc;border-top:1px solid var(--light-border);display:flex;gap:6px;overflow-x:auto;white-space:nowrap">
-            <button class="copilot-chip" data-quick-ask="Explain step by step how to use this project">🚀 How to Use</button>
-            <button class="copilot-chip" data-quick-ask="Which store data integration option should I choose?">🔌 Integrate Store Data</button>
-            <button class="copilot-chip" data-quick-ask="Why is the #1 priority SKU flagged?">❓ Why #1 SKU?</button>
-            <button class="copilot-chip" data-quick-ask="Explain the scoring formula">📐 Scoring Formula</button>
-            <button class="copilot-chip" data-quick-ask="How is Rupee Recovery calculated?">💰 Rupee Recovery</button>
-            <button class="copilot-chip" data-quick-ask="Show me SQLite database status">🗄️ Database Status</button>
+            <button class="copilot-chip" data-quick-ask="Explain step by step how to use this project">How to Use</button>
+            <button class="copilot-chip" data-quick-ask="Which store data integration option should I choose?">Integrate Store Data</button>
+            <button class="copilot-chip" data-quick-ask="Why is the #1 priority SKU flagged?">Why #1 SKU?</button>
+            <button class="copilot-chip" data-quick-ask="Explain the scoring formula">Scoring Formula</button>
+            <button class="copilot-chip" data-quick-ask="How is Rupee Recovery calculated?">Rupee Recovery</button>
+            <button class="copilot-chip" data-quick-ask="Show me SQLite database status">Database Status</button>
           </div>
 
           <div class="copilot-input-area">
@@ -2534,7 +2553,7 @@
     const scanBtn = document.getElementById('simulateScanBtn');
     if (scanBtn) {
       scanBtn.onclick = () => {
-        toast('📷 Barcode scanned: SKU validated against inventory ledger.');
+        toast('Barcode scanned: SKU validated against inventory ledger.');
       };
     }
 
@@ -2622,7 +2641,7 @@
     if (syncErpBtn) {
       syncErpBtn.onclick = () => {
         if (!AppState.verifiedItems || AppState.verifiedItems.length === 0) {
-          toast('⚠️ No verification records to sync yet. Complete a shelf check first.');
+          toast('No verification records to sync yet. Complete a shelf check first.');
           return;
         }
         const syncTimestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
@@ -2680,7 +2699,7 @@
       signOutBtn.onclick = () => {
         AppState.isAuthenticated = false;
         renderApp();
-        toast('🔒 Session locked. Returned to Landing & Authentication portal.');
+        toast('Session locked. Returned to Landing portal.');
       };
     }
 
@@ -2739,7 +2758,7 @@
     if (runAiBtn && AppState.selectedSku) {
       runAiBtn.onclick = async () => {
         runAiBtn.disabled = true;
-        runAiBtn.innerHTML = '⚡ Generating AI Diagnostic...';
+        runAiBtn.innerHTML = 'Generating AI Diagnostic...';
         const outDiv = document.getElementById('aiDiagnosticOutput');
         if (outDiv) {
           outDiv.style.display = 'block';
@@ -2765,7 +2784,7 @@
           `;
         }
         runAiBtn.disabled = false;
-        runAiBtn.innerHTML = '⚡ Re-Generate AI Diagnostic';
+        runAiBtn.innerHTML = 'Generate AI Diagnostic';
       };
     }
 
@@ -2873,7 +2892,7 @@
     }
     if (runBenchmarkBtn) {
       runBenchmarkBtn.onclick = () => {
-        toast('⚖ Benchmark re-executed across all 750 store-days.');
+        toast('Benchmark re-executed across all 750 store-days.');
         renderApp();
       };
     }
@@ -2887,13 +2906,13 @@
         const days = Number(document.getElementById('simDays')?.value || 30);
 
         genBtn.disabled = true;
-        genBtn.innerHTML = '⚡ Simulating 7 Failure Modes...';
+        genBtn.innerHTML = 'Simulating 7 Failure Modes...';
 
         setTimeout(() => {
           AppState.customDataset = AI.SyntheticSimulator.generateDataset(stores, skus, days);
           const dates = getAvailableDates();
           AppState.activeDate = dates[dates.length - 1];
-          toast(`🔬 Synthetic simulation ready: ${AppState.customDataset.length.toLocaleString()} records created!`);
+          toast(`Synthetic simulation ready: ${AppState.customDataset.length.toLocaleString()} records created.`);
           AppState.activePage = 'dashboard';
           renderApp();
         }, 300);
@@ -2912,7 +2931,7 @@
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        toast('✓ Store CSV template downloaded!');
+        toast('Store CSV template downloaded.');
       };
     }
 
@@ -2920,13 +2939,13 @@
     if (loadSampleStoreBtn) {
       loadSampleStoreBtn.onclick = () => {
         loadSampleStoreBtn.disabled = true;
-        loadSampleStoreBtn.innerHTML = '⚡ Generating 2,000-Row Store Dataset...';
+        loadSampleStoreBtn.innerHTML = 'Generating 2,000-Row Store Dataset...';
         setTimeout(() => {
           AppState.customDataset = AI.SyntheticSimulator.generateDataset(5, 40, 10);
           const dates = getAvailableDates();
           AppState.activeDate = dates[dates.length - 1];
           AppState.activePage = 'queue';
-          toast('✓ Loaded 2,000 real-store transaction rows! Displaying Morning Queue.');
+          toast('Loaded 2,000 real-store transaction rows. Displaying Morning Queue.');
           renderApp();
         }, 300);
       };
@@ -2936,16 +2955,16 @@
     if (testApiPingBtn) {
       testApiPingBtn.onclick = async () => {
         testApiPingBtn.disabled = true;
-        testApiPingBtn.innerHTML = '⚡ Pinging ERP Gateway...';
+        testApiPingBtn.innerHTML = 'Pinging ERP Gateway...';
         try {
           const res = await fetch('/api/status');
           const data = await res.json();
-          toast(`✓ ERP Cloud API Gateway connected! Latency: 3.8ms | Total Audits Reconciled: ${data.totalAuditsLogged}`);
+          toast(`ERP Cloud API Gateway connected! Latency: 3.8ms | Total Audits Reconciled: ${data.totalAuditsLogged}`);
         } catch (e) {
-          toast('✓ Mock ERP Cloud API Gateway validated.');
+          toast('Mock ERP Cloud API Gateway validated.');
         }
         testApiPingBtn.disabled = false;
-        testApiPingBtn.innerHTML = '⚡ Test ERP API Ping & Webhook';
+        testApiPingBtn.innerHTML = 'Test ERP API Ping & Webhook';
       };
     }
 
@@ -3023,13 +3042,13 @@
     if (runEdgeAiTestBtn) {
       runEdgeAiTestBtn.onclick = () => {
         runEdgeAiTestBtn.disabled = true;
-        runEdgeAiTestBtn.innerHTML = '⚡ Running Inference Self-Check...';
+        runEdgeAiTestBtn.innerHTML = 'Running Inference Self-Check...';
         const t0 = performance.now();
         setTimeout(() => {
           const latency = (performance.now() - t0 + 1.2).toFixed(1);
           runEdgeAiTestBtn.disabled = false;
-          runEdgeAiTestBtn.innerHTML = '<span>⚡</span> Run Neural Engine Self-Check';
-          toast(`✓ Edge Neural AI benchmark passed in ${latency}ms! Local Poisson-Gamma model online and verified.`);
+          runEdgeAiTestBtn.innerHTML = 'Run Neural Engine Self-Check';
+          toast(`Edge Neural AI benchmark passed in ${latency}ms! Local Poisson-Gamma model online and verified.`);
         }, 220);
       };
     }
@@ -3120,16 +3139,16 @@
     if (!filesList || filesList.length === 0) return;
     const files = Array.from(filesList).filter(f => f && (f.name.endsWith('.csv') || f.name.endsWith('.tsv') || f.name.endsWith('.txt') || f.name.endsWith('.xlsx') || f.name.endsWith('.xls') || f.text));
     if (files.length === 0) {
-      toast('⚠️ No CSV, TSV, or Excel files found in the selected batch.');
+      toast('No CSV, TSV, or Excel files found in the selected batch.');
       return;
     }
 
-    toast(`⏳ Reading ${files.length} file(s) from ${sourceName}...`);
+    toast(`Reading ${files.length} file(s) from ${sourceName}...`);
     const readResults = await Promise.all(files.map(f => readFileContent(f)));
     const validFiles = readResults.filter(f => f.text && f.text.trim().length > 0);
 
     if (validFiles.length === 0) {
-      toast('❌ No readable CSV/Excel text found in the files.');
+      toast('No readable CSV/Excel text found in the files.');
       return;
     }
 
@@ -3240,7 +3259,7 @@
     }
 
     if (allRecords.length === 0) {
-      toast('❌ No sales transaction records found with required columns (date, store_id, sku_id, units_sold, on_hand_eod).');
+      toast('No sales transaction records found with required columns (date, store_id, sku_id, units_sold, on_hand_eod).');
       return;
     }
 
