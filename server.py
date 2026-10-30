@@ -169,34 +169,51 @@ class StockSentryRetailAgent:
         # Check for specific SKU lookup (e.g., "SKU-104", "sku 319", "sku-005")
         sku_match = re.search(r'\b(sku[- ]?[0-9]{1,4})\b', query)
 
-        # 1. Greetings & Conversational Identity
+        # 1. Gratitude, Acknowledgements & Conversational Politeness
+        if any(query.startswith(g) for g in ["thanks", "thank you", "thx", "awesome", "great", "cool", "good job", "nice", "perfect", "ok", "okay", "got it"]):
+            return f"""### You are very welcome!
+I am dedicated to ensuring your retail network maintains total shelf availability.
+
+**Current Network Telemetry (Store {active_store})**:
+• **Morning Verification Queue**: Top 20 prioritized phantom anomalies ready for daily shelf walk.
+• **Ground-Truth Audit Database**: **{total_audits} physical audits** permanently saved in SQLite (`stocksentry.db`).
+• **Verified Preserved Revenue**: **₹{int(total_recovered):,}** recovered from phantom stock-out corrections.
+
+**How else can I assist your operations?**
+• Check a specific SKU (e.g. *"Analyze SKU-104"*)
+• Review the **Bayesian Poisson scoring formula**
+• Explain the **Annual Rupee Recovery calculation**
+• Walk through the **4 Store Data Integration pathways**
+• Run the **evaluate.py competition benchmark**"""
+
+        # 2. Greetings & Conversational Identity
         if not query or any(query == g for g in ["hi", "hello", "hey", "greetings", "good morning", "good evening", "help"]):
-            return f"""### 👋 Hello! I am your StockSentry AI Copilot.
-I am an autonomous, deep retail operations agent monitoring **all 25 stores and 800 catalog SKUs** in your retail network.
+            return f"""### StockSentry AI Copilot — Operational Overview
+Hello! I am your autonomous retail operations agent monitoring **all 25 stores and 800 catalog SKUs** in your retail network.
 
 **Current Network Status (Store {active_store})**:
-* **Morning Verification Queue**: Top 20 prioritized phantom anomalies ready for shelf walk.
-* **Ground-Truth Audit Database**: **{total_audits} physical audits** permanently saved in SQLite (`stocksentry.db`).
-* **Verified Preserved Revenue**: **₹{int(total_recovered):,}** recovered from phantom stock-out corrections.
-* **Master Documentation**: Publication-quality 10-page PRD & Technical Manual is ready for download.
+• **Morning Verification Queue**: Top 20 prioritized phantom anomalies ready for shelf walk.
+• **Ground-Truth Audit Database**: **{total_audits} physical audits** permanently saved in SQLite (`stocksentry.db`).
+• **Verified Preserved Revenue**: **₹{int(total_recovered):,}** recovered from phantom stock-out corrections.
+• **Master Documentation**: Publication-quality 10-page PRD & Technical Manual is ready for download.
 
 **How can I assist you right now?**
-* 📄 *Ask for the Master PRD & Documentation PDF*
-* 🚨 *Ask why Rank #1 SKU or any specific SKU is flagged*
-* 📐 *Ask how the Bayesian Latent-State Poisson scoring formula works*
-* 💰 *Ask how annual Rupee Recovery (ROI) is calculated*
-* 🔌 *Ask how to integrate store data (SAP, Oracle, POS CSV, Handheld)*
-* 🚀 *Ask for a step-by-step operator guide on how to use this platform*"""
+• *Ask for the Master PRD & Documentation PDF*
+• *Ask why Rank #1 SKU or any specific SKU is flagged*
+• *Ask how the Bayesian Latent-State Poisson scoring formula works*
+• *Ask how annual Rupee Recovery (ROI) is calculated*
+• *Ask how to integrate store data (SAP, Oracle, POS CSV, Handheld)*
+• *Ask for a step-by-step operator guide on how to use this platform*"""
 
-        # 2. Master Documentation & PRD PDF Download
+        # 3. Master Documentation & PRD PDF Download
         if any(k in query for k in ["pdf", "documentation", "download pdf", "download manual", "master doc", "whitepaper", "reportlab", "prd doc"]):
-            return f"""### 📄 StockSentry AI — Master Project Documentation & PRD (PDF)
+            return f"""### StockSentry AI — Master Project Documentation & PRD (PDF)
 A complete, publication-quality 10-page technical manual and Product Requirements Document (PRD) has been compiled and is hosted directly on this server.
 
-#### 📥 Download Link:
-👉 **[Click Here to Download Master PRD & Technical Documentation PDF](/StockSentry_AI_Master_Documentation_and_PRD.pdf)** *(10 Pages, Publication-Grade)*
+#### Download Link:
+• **[Click Here to Download Master PRD & Technical Documentation PDF](/StockSentry_AI_Master_Documentation_and_PRD.pdf)** *(10 Pages, Publication-Grade)*
 
-#### 📋 Contents of the Master Document:
+#### Contents of the Master Document:
 1. **Executive Summary & System Overview**: The phantom stock-out crisis, retail impact, and core solution thesis.
 2. **Product Requirements Document (PRD)**: Full specifications for Problem R1, constraints (20-check quota), metrics, and success criteria.
 3. **End-to-End System Architecture**: High-speed Vanilla SPA, Python multithreaded REST server, SQLite 3 ACID schema, and Edge Neural zero-config engine.
@@ -208,73 +225,87 @@ A complete, publication-quality 10-page technical manual and Product Requirement
 9. **Step-by-Step Operator Manual**: Exact workflow instructions for Store Associates, Department Supervisors, and Executive Directors.
 10. **Competition Deliverables & Compliance Matrix**: 100% verified compliance verification against all problem requirements."""
 
-        # 3. PRD & Problem Statement R1 Details
+        # 4. Jury Dataset, Evaluation Data & Folder Drop Inquiries
+        if any(k in query for k in ["jury", "dataset", "data we gave", "where is the data", "folder drop", "reset"]):
+            return f"""### Competition Dataset & Jury Evaluation Data Architecture
+
+**1. Where is the official hackathon data stored?**
+• **Core Dataset**: The official Problem R1 training and test data encompasses 25 physical supermarket stores, 800 catalog SKUs, and 548 operational dates (~7.97 million store-SKU-day transaction records).
+• **Evaluation Subset**: Scored across 1,183 development store-days (28 dates × 13 evaluation stores) on hidden ground-truth physical audit labels.
+• **Submission Artifact**: The final predictions file is located under `submission/R1_predictions.csv` containing exactly **14,000 rows** (25 stores × 28 dates × 20 item predictions).
+
+**2. How to demonstrate this to the Jury**:
+• **Option A — Live Benchmark**: Open **evaluate.py Benchmark** in the sidebar. Click **Run evaluate.py Benchmark** to execute the official competition evaluation harness in <5ms. It demonstrates **40.54% Precision@20** (+0.89 pp gain over the 39.65% organizer baseline) and **46.83% Share of Ceiling**.
+• **Option B — Full Folder Batch Drop**: In **Store Data Integration**, drop any external folder or multi-file CSV batch into the **POS CSV / Excel Batch Drop** zone. The system ingests transactions, matches catalog metadata, and recalculates all dashboards dynamically.
+• **Option C — Reversible Reset**: In **Settings**, clicking **Reset to Default** flushes any newly uploaded data without altering the pristine baseline competition dataset."""
+
+        # 5. PRD & Problem Statement R1 Details
         if any(k in query for k in ["prd", "problem statement", "problem r1", "objective", "requirement", "r1 challenge", "what is phantom stock", "what does this project do", "about this project"]):
-            return f"""### 📋 Problem Statement R1 & PRD Specifications:
+            return f"""### Problem Statement R1 & PRD Specifications:
 **Problem R1: Phantom Stock-Out Detection (Ghost Inventory)**
 
 #### The Core Problem:
 In multi-store retail environments, ERP inventory ledgers regularly show positive on-hand inventory for items whose physical shelves are completely empty. This occurs due to **shoplifting/theft, cashier mis-scans, unrecorded breakages, or misplaced cartons**.
-* Because the system believes stock is available, **automated replenishment purchase orders are frozen**.
-* Customers find empty shelves, abandon carts, or switch stores, creating silent compounding revenue leakage.
+• Because the system believes stock is available, **automated replenishment purchase orders are frozen**.
+• Customers find empty shelves, abandon carts, or switch stores, creating silent compounding revenue leakage.
 
 #### PRD Constraints & Key Requirements:
 1. **Strict Store Associate Quota (Max 20 Checks/Store/Day)**: Floor associates cannot physically audit 800+ SKUs daily. The model must prioritize exactly the **Top 20 highest-probability, highest-risk anomalies**.
-2. **Primary Metric: Precision@20**: Maximizing the percentage of the 20 audited SKUs that are genuine physical phantom stock-outs ($>85\\%$ benchmark).
+2. **Primary Metric: Precision@20**: Maximizing the percentage of the 20 audited SKUs that are genuine physical phantom stock-outs (>85% benchmark).
 3. **No Black-Box Numbers**: Transparent, auditable mathematical scoring based on observed sales telemetry and baseline velocity.
-4. **Slow-Mover Safeguards**: Items with low baseline demand ($<0.4$ units/day) must be dampened to prevent natural intermittent gaps from triggering false alarm audits.
+4. **Slow-Mover Safeguards**: Items with low baseline demand (<0.4 units/day) must be dampened to prevent natural intermittent gaps from triggering false alarm audits.
 5. **Stretch Goal Separation**: System must distinguish true **Phantom Stock-Outs** from **Misplaced SKUs** (intermittent scans) and **Delisted/Obsolete SKUs** (zero warehouse POs).
 6. **Financial Quantifiability**: Must produce an auditable annual Rupee Recovery calculation with sensitivity analysis."""
 
         # Presentation Speech & Storytelling Pitch (5-10 Minutes)
         if any(k in query for k in ["speech", "presentation", "how to explain", "pitch", "storytelling", "talk", "demo speech", "script"]):
-            return """### 🎙️ Master Technical Presentation & Storytelling Speech (5–10 Minutes)
+            return """### Master Technical Presentation & Storytelling Speech (5–10 Minutes)
 Here is your complete presentation strategy and storytelling blueprint to explain StockSentry AI:
 
-#### 🎭 The 5-Phase Storytelling Structure:
+#### The 5-Phase Storytelling Structure:
 1. **The Hook: The "Ghost on the Shelf" (0:00 – 1:30)**: Start with the relatable shopper story. You visit the store for sparkling water; the app says 9 in stock; the shelf is empty! Cashier doesn't know, ERP is asleep, and revenue bleeds silently. Cite the NRF $112B annual loss.
 2. **The Core Dilemma & The 20-Audit Quota (1:30 – 3:00)**: Explain why you can't just count 40,000 items. Associate quota is exactly **20 checks/store-day**. Every check must count—maximizing **Precision@20** and dampening slow-movers by 55%.
-3. **The Live 16-Module Tour (3:00 – 6:30)**: Walk through Command Center → Morning Queue → SKU Investigation → Physical Verification Modal → Real SQLite backend auto-reconciliation → Feedback Loop → Rupee Recovery ROI (₹2.78 Cr chain savings) → Store Data Integration Hub (4 pathways) → Synthetic Studio (7 failure modes) → evaluate.py benchmark (93.8% precision in <5ms).
+3. **The Live 16-Module Tour (3:00 – 6:30)**: Walk through Command Center → Morning Queue → SKU Investigation → Physical Verification Modal → Real SQLite backend auto-reconciliation → Feedback Loop → Rupee Recovery ROI (₹2.78 Cr chain savings) → Store Data Integration Hub (4 pathways) → Synthetic Studio (7 failure modes) → evaluate.py benchmark (40.54% precision in <5ms).
 4. **The Math Under the Hood (6:30 – 8:00)**: Explain Poisson zero likelihood e^(-λ), joint zero streak e^(-λN) (1 in 2 million chance for 8 consecutive zero days), and Bayesian posterior calculation.
 5. **Climax & Vision (8:00 – 9:30)**: How StockSentry AI turns chaotic guessing into a disciplined 15-minute daily operational routine, cutting undetected leak time from 18 to 2.4 days.
 
-👉 **Note**: The full word-for-word presentation script with stage directions and vocal cues is included in **Chapter 7 of the Master PDF** and in [`TECHNICAL_SPEECH_GUIDE.md`](/TECHNICAL_SPEECH_GUIDE.md)!"""
+• **Note**: The full word-for-word presentation script with stage directions is included in **Chapter 7 of the Master PDF** and in [`TECHNICAL_SPEECH_GUIDE.md`](/TECHNICAL_SPEECH_GUIDE.md)!"""
 
-        # 4. Step-by-Step Operator Guide / How to Use
+        # 6. Step-by-Step Operator Guide / How to Use
         if any(k in query for k in ["how to use", "step by step", "workflow", "operator manual", "guide", "how do i use", "walkthrough", "tutorial"]):
-            return f"""### 🚀 Step-by-Step Operator & Store Manager Workflow:
+            return f"""### Step-by-Step Operator & Store Manager Workflow:
 Here is how store teams and operations managers use StockSentry AI from morning opening to evening review:
 
-#### 🌅 Phase 1: Morning Opening (08:30 AM)
+#### Phase 1: Morning Opening (08:30 AM)
 1. **Open Command Center**: Select your store (e.g. **Store {active_store}**) and check the network health cards (Phantom Alert Rate, Store Compliance, and Preserved Revenue).
 2. **Access Morning Queue**: Click **Morning Queue (Top 20)** in the sidebar. This displays today's 20 prioritized anomalies sorted by Bayesian Priority Score.
 3. **Export or Walk**: Click **Export Top 20** to generate a handheld-compatible CSV, or carry a mobile tablet directly onto the floor.
 
-#### 🚶 Phase 2: Physical Floor Walk (09:00 AM)
+#### Phase 2: Physical Floor Walk (09:00 AM)
 4. **Inspect Physical Shelf**: Walk to the aisle and bay listed for Priority #1 (e.g. SKU-104). Check both the front shelf facing and backroom top-stock.
 5. **Click Physical Verification**: Click the **Verify** button next to the SKU in the queue or navigation menu.
 6. **Submit Ground-Truth Count**: Enter the actual count found on the shelf (e.g. 0 units), select the root cause (**Confirmed Phantom Stock-Out**, **Misplaced on Wrong Shelf**, **Delisted**, or **False Positive**), and enter audit notes.
 7. **Real-Time ERP Reconciliation**: Clicking **Submit Verification** automatically saves the record to the SQLite database (`stocksentry.db`) and immediately executes a write-down in the central ERP inventory ledger, unlocking replenishment!
 
-#### 📊 Phase 3: Analytical & Model Review (02:00 PM)
+#### Phase 3: Analytical & Model Review (02:00 PM)
 8. **Feedback & Learning**: Check the **Feedback & Learning** module to see your verified audits, ground-truth label distribution, and retrained feature weights.
 9. **Benchmark Evaluation**: Open **evaluate.py Benchmark** to run performance validation across 750 store-days in <5ms, verifying Precision@20 and hidden-label recall.
 10. **Rupee Recovery (ROI)**: Open **Rupee Recovery (ROI)** to see cumulative financial savings and adjust margin or leak duration sensitivity sliders.
 11. **Store Data Integration**: Upload new POS transaction batches or connect your Cloud ERP API in the **Store Data Integration** hub."""
 
-        # 5. Technical Architecture & Tech Stack
+        # 7. Technical Architecture & Tech Stack
         if any(k in query for k in ["architecture", "tech stack", "backend", "frontend", "technologies", "how it is built", "database schema"]):
-            return f"""### 🏗️ StockSentry AI Technical Architecture & Stack:
+            return f"""### StockSentry AI Technical Architecture & Stack:
 
-#### 1. 🖥️ Frontend Architecture (High-Speed Vanilla SPA)
-* **Core**: Pure HTML5 semantic structure, modern Vanilla JavaScript (ES6+ modular closures), and Vanilla CSS3.
-* **Aesthetics**: Glassmorphism design system, curated HSL color palette, and dynamic dual-theme (Dark slate operations control bar + Light canvas workstation).
-* **Data Visualization**: Real-time Canvas-based trend renderers and SVG distribution charts with sub-millisecond redraws.
-* **Zero Framework Bloat**: No heavy external dependencies (React, Angular, Tailwind), guaranteeing instantaneous load times and zero supply-chain vulnerabilities.
+#### 1. Frontend Architecture (High-Speed Vanilla SPA)
+• **Core**: Pure HTML5 semantic structure, modern Vanilla JavaScript (ES6+ modular closures), and Vanilla CSS3.
+• **Aesthetics**: Glassmorphism design system, curated HSL color palette, and dynamic dual-theme (Dark slate operations control bar + Light canvas workstation).
+• **Data Visualization**: Real-time Canvas-based trend renderers and SVG distribution charts with sub-millisecond redraws.
+• **Zero Framework Bloat**: No heavy external dependencies (React, Angular, Tailwind), guaranteeing instantaneous load times and zero supply-chain vulnerabilities.
 
-#### 2. ⚙️ Backend Architecture (Python 3 Multithreaded REST Server)
-* **Server**: Python 3 `http.server` running on port 8080 (`server.py`).
-* **Endpoints**:
+#### 2. Backend Architecture (Python 3 Multithreaded REST Server)
+• **Server**: Python 3 `http.server` running on port 8080 (`server.py`).
+• **Endpoints**:
   - `GET /api/status`: System health, total audits, recovered rupees, and ERP record counts.
   - `GET /api/feedback`: Retrieves persisted ground-truth audits from SQLite.
   - `POST /api/verify`: Records physical shelf audits, calculates recovered rupees, and auto-reconciles ERP on-hand.
@@ -282,18 +313,18 @@ Here is how store teams and operations managers use StockSentry AI from morning 
   - `GET /api/trends`: Multi-store historical phantom detection rates and weekly trends.
   - `POST /api/ingest`: Validates and ingests external store CSV files and Cloud ERP payloads.
   - `POST /api/copilot`: Dynamic contextual retail intelligence agent.
-* **Static Asset Serving**: Serves all UI files, vector graphics, and the Master PRD PDF.
+• **Static Asset Serving**: Serves all UI files, vector graphics, and the Master PRD PDF.
 
-#### 3. 🗄️ Database Architecture (SQLite 3 ACID Storage)
-* **Engine**: SQLite 3 database (`stocksentry.db`).
-* **Tables**:
+#### 3. Database Architecture (SQLite 3 ACID Storage)
+• **Engine**: SQLite 3 database (`stocksentry.db`).
+• **Tables**:
   1. `audit_verifications`: Stores ground-truth physical audits (ID, timestamp, store, SKU, system qty, found qty, discrepancy, outcome, notes, auditor, recovered rupees).
   2. `erp_ledger`: Central ERP inventory balances with real-time automated write-down synchronization.
   3. `model_metrics`: Historical benchmark runs and precision metrics."""
 
-        # 6. Bayesian Scoring Mathematics & Poisson Derivations
+        # 8. Bayesian Scoring Mathematics & Poisson Derivations
         if any(k in query for k in ["math", "formula", "bayesian", "poisson", "algorithm", "calculation", "score", "how it works"]):
-            return r"""### 📐 Bayesian Latent-State Anomaly Scoring Mathematics:
+            return r"""### Bayesian Latent-State Anomaly Scoring Mathematics:
 StockSentry AI avoids heuristic threshold guessing by formulating phantom stock-out detection as a **Bayesian Latent-State Inference Problem**:
 
 #### 1. Zero-Sales Likelihood under Poisson Demand:
@@ -310,80 +341,80 @@ $$P(\text{Phantom} \mid Z_N) = \frac{1.0 \times P_0}{(1.0 \times P_0) + (e^{-\su
 
 #### 3. Multi-Factor Composite Priority Score (0–100):
 The final score combines four operational risk dimensions:
-* **Zero-Sales Persistence ($w_1 = 52\%$)**: Normalized Poisson shortfall factor $(1 - e^{-\lambda N})$.
-* **Demand Gap Ratio ($w_2 = 28\%$)**: Shortfall between expected customer demand and zero observed transactions.
-* **Static ERP On-Hand ($w_3 = 12\%$)**: Penalizes items whose recorded on-hand quantity has remained frozen across multiple days.
-* **Promotion Lift Factor**: Active promotions increase expected demand by $+60\%$, magnifying the anomaly penalty.
-* **Slow-Mover Anti-Noise Filter**: For intermittent items with $\lambda < 0.4$ units/day, scores are automatically dampened by **55%** to protect store associates from chasing natural demand pauses."""
+• **Zero-Sales Persistence ($w_1 = 52\%$)**: Normalized Poisson shortfall factor $(1 - e^{-\lambda N})$.
+• **Demand Gap Ratio ($w_2 = 28\%$)**: Shortfall between expected customer demand and zero observed transactions.
+• **Static ERP On-Hand ($w_3 = 12\%$)**: Penalizes items whose recorded on-hand quantity has remained frozen across multiple days.
+• **Promotion Lift Factor**: Active promotions increase expected demand by $+60\%$, magnifying the anomaly penalty.
+• **Slow-Mover Anti-Noise Filter**: For intermittent items with $\lambda < 0.4$ units/day, scores are automatically dampened by **55%** to protect store associates from chasing natural demand pauses."""
 
-        # 7. Stretch Goal: Multi-Class Signal Separation
+        # 9. Stretch Goal: Multi-Class Signal Separation
         if any(k in query for k in ["stretch", "misplaced", "delisted", "signal shape", "separation", "three classes", "classify"]):
-            return """### 🎯 Stretch Goal: Multi-Class Signal Shape Separation
+            return """### Stretch Goal: Multi-Class Signal Shape Separation
 StockSentry AI solves the advanced stretch goal by differentiating three structurally distinct operational failure modes:
 
-#### 1. 🚨 Phantom Stock-Out (Shrinkage / Theft / Breakage)
-* **Signal Geometry**: Immediate, sharp collapse of daily sales to zero while recorded ERP on-hand remains positive and frozen.
-* **Velocity Context**: Fast-moving SKU (λ ≥ 1.5 units/day).
-* **Physical Reality**: The shelf is physically vacant.
-* **Action**: Immediate stock write-down to 0 in ERP; replenishment order auto-triggered.
+#### 1. Phantom Stock-Out (Shrinkage / Theft / Breakage)
+• **Signal Geometry**: Immediate, sharp collapse of daily sales to zero while recorded ERP on-hand remains positive and frozen.
+• **Velocity Context**: Fast-moving SKU (λ ≥ 1.5 units/day).
+• **Physical Reality**: The shelf is physically vacant.
+• **Action**: Immediate stock write-down to 0 in ERP; replenishment order auto-triggered.
 
-#### 2. 🔀 Misplaced on Wrong Shelf / Backroom Stash
-* **Signal Geometry**: Erratic micro-sales spikes (e.g. 1 unit sold every 4–5 days) interspersed with multi-day zero streaks.
-* **Physical Reality**: Shoppers occasionally discover cans or cartons left behind in neighboring aisles or sitting unopened on backroom top-stock risers.
-* **Action**: Do not write down stock! Direct associate to sweep adjacent bays within 3 feet and return rogue units to primary planogram facing.
+#### 2. Misplaced on Wrong Shelf / Backroom Stash
+• **Signal Geometry**: Erratic micro-sales spikes (e.g. 1 unit sold every 4–5 days) interspersed with multi-day zero streaks.
+• **Physical Reality**: Shoppers occasionally discover cans or cartons left behind in neighboring aisles or sitting unopened on backroom top-stock risers.
+• **Action**: Do not write down stock! Direct associate to sweep adjacent bays within 3 feet and return rogue units to primary planogram facing.
 
-#### 3. 📦 Delisted / Obsolete / End-of-Life SKU
-* **Signal Geometry**: Prolonged zero sales (>14 days) coupled with low residual stock and **zero incoming warehouse purchase orders**.
-* **Physical Reality**: Manufacturer has phased out the item or store merchandising has delisted the product.
-* **Action**: Mark SKU as inactive; initiate store clearance markdown."""
+#### 3. Delisted / Obsolete / End-of-Life SKU
+• **Signal Geometry**: Prolonged zero sales (>14 days) coupled with low residual stock and **zero incoming warehouse purchase orders**.
+• **Physical Reality**: Manufacturer has phased out the item or store merchandising has delisted the product.
+• **Action**: Mark SKU as inactive; initiate store clearance markdown."""
 
-        # 8. Rupee Recovery ROI Formulation & Arithmetic
+        # 10. Rupee Recovery ROI Formulation & Arithmetic
         if any(k in query for k in ["rupee", "money", "roi", "annual", "recovery", "revenue", "loss", "financial", "economics"]):
-            return f"""### 💰 Auditable Rupee Recovery Formulation:
+            return f"""### Auditable Rupee Recovery Formulation:
 We calculate the business return on investment (ROI) using transparent, auditable retail economics:
 
 $$\\text{{Annual Recovered ₹}} = \\sum_{{\\text{{Top 20 Verified}}}} \\Big( \\text{{Discrepancy Units}} \\times \\text{{Baseline Daily Demand}} \\times \\text{{Unit Price}} \\times 365 \\times \\eta \\Big)$$
 
 #### Key Economic Parameters:
-* **70% Realization Factor ($\\eta = 0.70$)**: Standard NRF retail benchmark acknowledging that 30% of shoppers who encounter an empty shelf will choose a substitute product in the same aisle, while 70% represent true permanent revenue leakage.
-* **Prevented Leak Duration**: Accelerates phantom stock identification from the industry average of **18 undetected days down to 2.4 days**, stopping silent margin drain.
-* **Real SQLite Verified Savings**: Currently, **₹{int(total_recovered):,}** in permanent revenue recovery has been recorded across **{total_audits} physical audits** in our SQLite database!"""
+• **70% Realization Factor ($\\eta = 0.70$)**: Standard NRF retail benchmark acknowledging that 30% of shoppers who encounter an empty shelf will choose a substitute product in the same aisle, while 70% represent true permanent revenue leakage.
+• **Prevented Leak Duration**: Accelerates phantom stock identification from the industry average of **18 undetected days down to 2.4 days**, stopping silent margin drain.
+• **Real SQLite Verified Savings**: Currently, **₹{int(total_recovered):,}** in permanent revenue recovery has been recorded across **{total_audits} physical audits** in our SQLite database!"""
 
-        # 9. Store Data Integration Hub
+        # 11. Store Data Integration Hub
         if any(k in query for k in ["integrate", "integration", "connect store", "sap", "oracle", "csv upload", "how to connect", "data pipeline", "schema"]):
-            return """### 🔌 Store Data Integration Options & Architecture:
+            return """### Store Data Integration Options & Architecture:
 StockSentry AI offers **4 flexible enterprise pathways** to connect your retail store network:
 
-#### 1. 🏢 Option 1: Direct Cloud ERP / WMS API Bridge (Automated Real-Time)
-* **Target Platforms**: SAP S/4HANA Retail, Oracle Retail (RMS), Blue Yonder, Microsoft Dynamics 365, Netsuite.
-* **Protocol**: RESTful JSON / Webhook API. Hourly transaction aggregates and midnight ERP snapshots.
-* **Auto-Reconciliation**: Real-time bidirectional synchronization. When a floor associate submits a verified phantom stock-out, StockSentry fires an authenticated inventory write-down API call to your central ERP!
+#### 1. Option 1: Direct Cloud ERP / WMS API Bridge (Automated Real-Time)
+• **Target Platforms**: SAP S/4HANA Retail, Oracle Retail (RMS), Blue Yonder, Microsoft Dynamics 365, Netsuite.
+• **Protocol**: RESTful JSON / Webhook API. Hourly transaction aggregates and midnight ERP snapshots.
+• **Auto-Reconciliation**: Real-time bidirectional synchronization. When a floor associate submits a verified phantom stock-out, StockSentry fires an authenticated inventory write-down API call to your central ERP!
 
-#### 2. 📁 Option 2: POS CSV / Excel Nightly Batch Drop (SFTP / Direct Upload)
-* **Target**: Regional supermarket chains without dedicated API integration engineering.
-* **Protocol**: Automated 03:00 AM SFTP batch drop or direct drag-and-drop in the UI.
-* **Required Columns**: `date, store_id, sku_id, units_sold, on_hand_qty, price, category, promotion`.
-* **Download**: You can download a pre-formatted sample CSV directly from the **Store Data Integration** tab!
+#### 2. Option 2: POS CSV / Excel Nightly Batch Drop (SFTP / Direct Upload)
+• **Target**: Regional supermarket chains without dedicated API integration engineering.
+• **Protocol**: Automated 03:00 AM SFTP batch drop or direct drag-and-drop in the UI.
+• **Required Columns**: `date, store_id, sku_id, units_sold, on_hand_qty, price, category, promotion`.
+• **Download**: You can download a pre-formatted sample CSV directly from the **Store Data Integration** tab!
 
-#### 3. 📱 Option 3: Handheld Barcode Scanner / PDA Mobile Audit Feed
-* **Target**: Floor associates utilizing Zebra TC52/TC57, Honeywell ScanPal, or CipherLab handheld computers.
-* **Protocol**: Real-time WebSocket or REST push of physical barcode scans.
+#### 3. Option 3: Handheld Barcode Scanner / PDA Mobile Audit Feed
+• **Target**: Floor associates utilizing Zebra TC52/TC57, Honeywell ScanPal, or CipherLab handheld computers.
+• **Protocol**: Real-time WebSocket or REST push of physical barcode scans.
 
-#### 4. 🔬 Option 4: Synthetic Retail Studio
-* **Target**: Stress-testing Bayesian sensitivity across 7 failure mechanisms with zero risk to production data."""
+#### 4. Option 4: Synthetic Retail Studio
+• **Target**: Stress-testing Bayesian sensitivity across 7 failure mechanisms with zero risk to production data."""
 
-        # 10. Database Status & SQLite Backend
+        # 12. Database Status & SQLite Backend
         if any(k in query for k in ["database", "sqlite", "sync", "ledger", "real backend", "tables", "storage"]):
-            return f"""### 🗄️ Real Backend & SQLite Ledger Status:
-* **Database File**: `stocksentry.db` (SQLite 3 ACID Storage).
-* **Logged Physical Audits**: **{total_audits} verified records** stored with timestamp, auditor name, found count, and discrepancy.
-* **Preserved Revenue in DB**: **₹{int(total_recovered):,}** permanently recorded.
-* **Central ERP Ledger Records**: **{erp_count} tracked SKUs**.
-* **Automated Two-Way Sync**: When an auditor records 0 units found during physical verification, the backend automatically sets `on_hand_qty = 0` in `erp_ledger`, closing the ghost inventory loop in real time!"""
+            return f"""### Real Backend & SQLite Ledger Status:
+• **Database File**: `stocksentry.db` (SQLite 3 ACID Storage).
+• **Logged Physical Audits**: **{total_audits} verified records** stored with timestamp, auditor name, found count, and discrepancy.
+• **Preserved Revenue in DB**: **₹{int(total_recovered):,}** permanently recorded.
+• **Central ERP Ledger Records**: **{erp_count} tracked SKUs**.
+• **Automated Two-Way Sync**: When an auditor records 0 units found during physical verification, the backend automatically sets `on_hand_qty = 0` in `erp_ledger`, closing the ghost inventory loop in real time!"""
 
-        # 11. 7 Synthetic Failure Modes
+        # 13. 7 Synthetic Failure Modes
         if any(k in query for k in ["failure modes", "synthetic studio", "7 modes", "failure mechanisms", "simulator"]):
-            return """### 🔬 The 7 Operational Failure Modes in Synthetic Studio:
+            return """### The 7 Operational Failure Modes in Synthetic Studio:
 StockSentry AI stress-tests detection algorithms against the 7 real-world causes of retail phantom inventory:
 1. **Shrinkage / Shoplifting**: Customer theft where high-value units exit the store without passing POS checkout scanners.
 2. **Misplacement on Wrong Shelf**: Shoppers carrying items into distant aisles or associates dumping cartons on wrong fixtures.
@@ -393,78 +424,78 @@ StockSentry AI stress-tests detection algorithms against the 7 real-world causes
 6. **Cycle-Count Error**: Audit staff accidentally counting neighboring facings twice during routine periodic counts.
 7. **Mixed Variance Drift**: Compounding low-level checkout scanning errors over extended time horizons."""
 
-        # 12. Benchmark Evaluation (`evaluate.py`)
+        # 14. Benchmark Evaluation (`evaluate.py`)
         if any(k in query for k in ["evaluate.py", "benchmark", "precision@20", "metric", "competition", "evaluation harness"]):
-            return """### ⚖️ Official Jury Evaluation (`evaluate.py`):
+            return """### Official Jury Evaluation (`evaluate.py`):
 StockSentry AI is scored directly by the untouched official competition evaluation harness (`evaluate.py`) across 1,183 development store-days (91 dates × 13 stores):
-* **Primary Metric (Mean Precision@20)**:
+• **Primary Metric (Mean Precision@20)**:
   - **StockSentry AI Model**: **40.54% Precision@20** (9,591 verified hits across 1,183 store-days).
   - **Organizer Baseline Model**: **39.65% Precision@20** (9,381 hits).
   - **Net Gain**: **+0.89 percentage points** (+210 additional true shelf-outs captured).
-* **Theoretical Precision Ceiling**: **86.56%** (mathematical maximum possible due to store-days with fewer than 20 true phantoms).
-* **Share of Theoretical Ceiling**: **46.83%** (vs. baseline 45.81%).
-* **Row Recall**: **41.42%** of all 23,156 positive shelf-out ground-truth days.
-* **Episode Recall**: **21.03%** of all 2,868 positive episodes detected.
-* **Delisted Decoy Suppression**: Reduced wasted checks from **5.20% down to 2.26%** using point-in-time chain cessation detection."""
+• **Theoretical Precision Ceiling**: **86.56%** (mathematical maximum possible due to store-days with fewer than 20 true phantoms).
+• **Share of Theoretical Ceiling**: **46.83%** (vs. baseline 45.81%).
+• **Row Recall**: **41.42%** of all 23,156 positive shelf-out ground-truth days.
+• **Episode Recall**: **21.03%** of all 2,868 positive episodes detected.
+• **Delisted Decoy Suppression**: Reduced wasted checks from **5.20% down to 2.26%** using point-in-time chain cessation detection."""
 
-        # 13. Retail Industry Shrinkage Knowledge & NRF Benchmarks
+        # 15. Retail Industry Shrinkage Knowledge & NRF Benchmarks
         if any(k in query for k in ["shrinkage", "shrink", "nrf", "industry", "gmroi", "retail trends", "theft statistics"]):
-            return """### 🌐 Retail Industry Shrinkage & Inventory Trends:
-* **Global Impact**: According to the **National Retail Federation (NRF) National Retail Security Survey**, total retail shrinkage accounts for **1.5% to 1.8% of total retail sales**, exceeding **$112 Billion globally** in losses annually.
-* **Phantom Inventory Prevalence**: Academic studies (e.g., DeHoratius & Raman, Harvard/MIT) indicate that **8% to 10% of inventory records in major supermarket chains are inaccurate**, with physical inventory lower than system on-hand.
-* **GMROI (Gross Margin Return on Investment)**: Phantom inventory artificially inflates recorded inventory assets while depressing gross margin dollars, severely damaging store GMROI and investor metrics.
-* **Customer Behavior**: When an item is ghost-out-of-stock, 31% of shoppers leave the store empty-handed, 37% buy an alternative brand, and 19% purchase from a competitor."""
+            return """### Retail Industry Shrinkage & Inventory Trends:
+• **Global Impact**: According to the **National Retail Federation (NRF) National Retail Security Survey**, total retail shrinkage accounts for **1.5% to 1.8% of total retail sales**, exceeding **$112 Billion globally** in losses annually.
+• **Phantom Inventory Prevalence**: Academic studies (e.g., DeHoratius & Raman, Harvard/MIT) indicate that **8% to 10% of inventory records in major supermarket chains are inaccurate**, with physical inventory lower than system on-hand.
+• **GMROI (Gross Margin Return on Investment)**: Phantom inventory artificially inflates recorded inventory assets while depressing gross margin dollars, severely damaging store GMROI and investor metrics.
+• **Customer Behavior**: When an item is ghost-out-of-stock, 31% of shoppers leave the store empty-handed, 37% buy an alternative brand, and 19% purchase from a competitor."""
 
-        # 14. Specific SKU or Rank #1 Query
+        # 16. Specific SKU or Rank #1 Query
         if any(k in query for k in ["#1", "rank 1", "top sku", "first sku", "highest risk", "worst item"]):
-            return f"""### 🚨 Priority Rank #1 SKU Analysis:
+            return f"""### Priority Rank #1 SKU Analysis:
 In **Store {active_store}**, the highest-priority anomaly is **SKU-104 (Sparkling Water 500ml)**.
-* **Recorded ERP Balance**: **9 units** reported in system stock.
-* **Sales Streak**: **8 consecutive zero-sales days** against an expected baseline of **1.8 units/day**.
-* **Financial Risk**: Daily revenue leakage of **₹4,250**.
-* **Physical Diagnosis**: Typical **Shrinkage / Stolen Units** signature. The shelf is almost certainly empty while ERP assumes healthy availability.
-* **Directive**: Inspect Aisle 2, Bay 4 immediately and record the actual shelf count."""
+• **Recorded ERP Balance**: **9 units** reported in system stock.
+• **Sales Streak**: **8 consecutive zero-sales days** against an expected baseline of **1.8 units/day**.
+• **Financial Risk**: Daily revenue leakage of **₹4,250**.
+• **Physical Diagnosis**: Typical **Shrinkage / Stolen Units** signature. The shelf is almost certainly empty while ERP assumes healthy availability.
+• **Directive**: Inspect Aisle 2, Bay 4 immediately and record the actual shelf count."""
 
         if sku_match:
             sku_found = sku_match.group(1).upper().replace(" ", "-")
             sku_info = cls.lookup_sku(sku_found, active_store)
-            return f"""### 🔍 SKU Telemetry: {sku_info['sku_id']} ({sku_info['product']})
-* **Store Context**: Store {active_store}
-* **Category**: {sku_info['category']}
-* **Retail Price**: ₹{sku_info['price']:.2f}
-* **Current ERP On-Hand**: **{sku_info['on_hand']} units** recorded in ledger
-* **Expected Daily Velocity**: **{sku_info['expected_demand']} units/day**
-* **Anomaly Assessment**: High probability of inventory discrepancy. Checkout scans have stalled while inventory remains frozen.
-* **Recommended Operational Procedure**:
+            return f"""### SKU Telemetry: {sku_info['sku_id']} ({sku_info['product']})
+• **Store Context**: Store {active_store}
+• **Category**: {sku_info['category']}
+• **Retail Price**: ₹{sku_info['price']:.2f}
+• **Current ERP On-Hand**: **{sku_info['on_hand']} units** recorded in ledger
+• **Expected Daily Velocity**: **{sku_info['expected_demand']} units/day**
+• **Anomaly Assessment**: High probability of inventory discrepancy. Checkout scans have stalled while inventory remains frozen.
+• **Recommended Operational Procedure**:
   1. Inspect primary shelf facing and verify barcode label.
   2. Check backroom top-stock risers and staging carts.
   3. If physical count is 0, enter 0 in StockSentry to auto-reconcile ERP stock and trigger purchase order replenishment."""
 
         if selected_sku:
-            return f"""### 🔍 SKU Telemetry: {selected_sku.get('sku_id', 'SKU')} ({selected_sku.get('product', 'Item')})
-* **Store Context**: Store {selected_sku.get('store_id', active_store)}
-* **ERP On-Hand**: {selected_sku.get('on_hand_qty', '—')} units
-* **Zero Streak**: {selected_sku.get('zeroStreak', '—')} consecutive days
-* **Expected Daily Demand**: {selected_sku.get('expectedDemand', '—')} units/day
-* **Priority Score**: {selected_sku.get('score', '—')}/100 ({selected_sku.get('confidence', '—')}% confidence)
-* **Root Cause**: {selected_sku.get('reasonCode', 'Inventory-sales mismatch')}
-* **Recommendation**: Perform immediate shelf-facing check and verify backroom staging carts."""
+            return f"""### SKU Telemetry: {selected_sku.get('sku_id', 'SKU')} ({selected_sku.get('product', 'Item')})
+• **Store Context**: Store {selected_sku.get('store_id', active_store)}
+• **ERP On-Hand**: {selected_sku.get('on_hand_qty', '—')} units
+• **Zero Streak**: {selected_sku.get('zeroStreak', '—')} consecutive days
+• **Expected Daily Demand**: {selected_sku.get('expectedDemand', '—')} units/day
+• **Priority Score**: {selected_sku.get('score', '—')}/100 ({selected_sku.get('confidence', '—')}% confidence)
+• **Root Cause**: {selected_sku.get('reasonCode', 'Inventory-sales mismatch')}
+• **Recommendation**: Perform immediate shelf-facing check and verify backroom staging carts."""
 
-        # 15. Intelligent Human Retail Director Fallback
-        return f"""### 🤖 StockSentry AI Operational Advisory:
+        # 17. Intelligent Human Retail Director Fallback
+        return f"""### StockSentry AI Tactical Assessment (Store {active_store})
 I understand your question regarding *"{raw_query}"*. As your senior retail operations and AI diagnostic copilot:
 
-* **Current Operating Context**: Monitoring **Store {active_store}** with 800 active catalog SKUs.
-* **Immediate Priority**: Ensure today's **Top 20 Morning Verification Queue** is walked before peak foot traffic at 11:00 AM.
-* **Verified Ledger**: **{total_audits} audits** have been permanently recorded in SQLite, preserving **₹{int(total_recovered):,}** in recovered revenue.
-* **Master Documentation**: You can download the complete 10-page PRD and technical architecture manual anytime via the topbar or by asking for the PDF.
+• **Current Operating Context**: Monitoring **Store {active_store}** with 800 active catalog SKUs.
+• **Immediate Priority**: Ensure today's **Top 20 Morning Verification Queue** is walked before peak foot traffic at 11:00 AM.
+• **Verified Ledger**: **{total_audits} audits** have been permanently recorded in SQLite, preserving **₹{int(total_recovered):,}** in recovered revenue.
+• **Master Documentation**: You can download the complete 10-page PRD and technical architecture manual anytime via the topbar or by asking for the PDF.
 
 **What specific operational topic would you like to explore next?**
-1. *Scoring Formula & Poisson Math*
-2. *Operator Manual Step-by-Step*
-3. *Store Data Integration Pathways*
-4. *Stretch Goal Multi-Class Separation*
-5. *Download Master PRD PDF*"""
+1. Scoring Formula & Poisson Math
+2. Step-by-Step Operator Manual
+3. Store Data Integration Pathways
+4. Stretch Goal Multi-Class Separation
+5. Download Master PRD PDF"""
 
 class StockSentryHandler(http.server.SimpleHTTPRequestHandler):
     """Custom HTTP handler serving static UI files and JSON API endpoints."""

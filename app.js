@@ -2427,7 +2427,7 @@
           <div class="copilot-title">
             <img src="assets/stocksentry_shield_icon.png" alt="Copilot" style="width:18px;height:18px;object-fit:contain;flex-shrink:0" />
             <span>StockSentry Copilot</span>
-            <span class="copilot-status-pill">${isMin ? '● Edge' : '● Zero-Config Active'}</span>
+            <span class="copilot-status-pill">${isMin ? '● Active' : '● Zero-Config Active'}</span>
           </div>
           <button id="toggleCopilotBtn" class="copilot-toggle-btn">
             ${isMin ? '▲ Expand' : '▼ Minimize'}
@@ -2449,7 +2449,7 @@
             <button class="copilot-chip" data-quick-ask="Why is the #1 priority SKU flagged?">Why #1 SKU?</button>
             <button class="copilot-chip" data-quick-ask="Explain the scoring formula">Scoring Formula</button>
             <button class="copilot-chip" data-quick-ask="How is Rupee Recovery calculated?">Rupee Recovery</button>
-            <button class="copilot-chip" data-quick-ask="Show me SQLite database status">Database Status</button>
+            <button class="copilot-chip" data-quick-ask="Where is the official jury dataset stored and how to show it?">Jury Dataset</button>
           </div>
 
           <div class="copilot-input-area">
@@ -2462,14 +2462,72 @@
   }
 
   function formatCopilotMarkdown(text) {
-    return text
-      .replace(/### (.*?)\n/g, '<div style="font-weight:800;color:var(--accent-indigo);margin:6px 0 2px">$1</div>')
-      .replace(/#### (.*?)\n/g, '<div style="font-weight:700;color:var(--text-main);margin:4px 0 2px">$1</div>')
-      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" download style="color:#4f46e5;font-weight:700;text-decoration:underline">$1</a>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/\n\n/g, '<div style="margin-top:6px"></div>')
-      .replace(/\n/g, '<br>');
+    if (!text) return '';
+    let html = text;
+
+    // LaTeX display math: $$...$$
+    html = html.replace(/\$\$([\s\S]*?)\$\$/g, (match, formula) => {
+      const cleanFormula = formula
+        .replace(/\\text\{([^}]+)\}/g, '$1')
+        .replace(/\\Big\(/g, '(')
+        .replace(/\\Big\)/g, ')')
+        .replace(/\\times/g, ' × ')
+        .replace(/\\sum_\{([^}]+)\}/g, 'Σ ($1)')
+        .replace(/\\prod_\{([^}]+)\}/g, 'Π ($1)')
+        .replace(/\\prod/g, 'Π')
+        .replace(/\\sum/g, 'Σ')
+        .replace(/\\lambda/g, 'λ')
+        .replace(/\\eta/g, 'η')
+        .replace(/\\approx/g, ' ≈ ')
+        .replace(/\\le/g, ' ≤ ')
+        .replace(/\\ge/g, ' ≥ ')
+        .replace(/\\mid/g, ' | ')
+        .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1 / $2)')
+        .replace(/\\/g, '');
+      return `<div style="background:rgba(79,70,229,0.06);border-left:3px solid #4f46e5;padding:8px 12px;margin:8px 0;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;color:#1e1b4b;border-radius:4px;overflow-x:auto;"><strong>Formula:</strong> ${cleanFormula}</div>`;
+    });
+
+    // LaTeX inline math: $...$
+    html = html.replace(/\$([^$\n]+)\$/g, (match, inline) => {
+      const cleanInline = inline
+        .replace(/\\text\{([^}]+)\}/g, '$1')
+        .replace(/\\lambda/g, 'λ')
+        .replace(/\\eta/g, 'η')
+        .replace(/\\times/g, ' × ')
+        .replace(/\\approx/g, ' ≈ ')
+        .replace(/\\le/g, ' ≤ ')
+        .replace(/\\ge/g, ' ≥ ')
+        .replace(/\\mid/g, ' | ')
+        .replace(/\\/g, '');
+      return `<code style="background:rgba(79,70,229,0.08);padding:1px 4px;border-radius:3px;font-family:monospace;font-size:11.5px;color:#312e81">${cleanInline}</code>`;
+    });
+
+    // Code blocks: ```...```
+    html = html.replace(/```(?:\w+)?\n([\s\S]*?)```/g, '<pre style="background:#0f172a;color:#f8fafc;padding:8px 12px;border-radius:6px;font-size:11px;overflow-x:auto;margin:6px 0"><code>$1</code></pre>');
+    html = html.replace(/`([^`]+)`/g, '<code style="background:rgba(0,0,0,0.06);padding:2px 5px;border-radius:4px;font-family:monospace;font-size:11.5px">$1</code>');
+
+    // Headers
+    html = html.replace(/(?:^|\n)###\s*(.*?)(?=\n|$)/g, '<div style="font-weight:800;color:var(--accent-indigo);font-size:13.5px;margin:8px 0 4px">$1</div>');
+    html = html.replace(/(?:^|\n)####\s*(.*?)(?=\n|$)/g, '<div style="font-weight:700;color:var(--text-main);font-size:12.5px;margin:6px 0 3px">$1</div>');
+
+    // Markdown links
+    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" download style="color:#4f46e5;font-weight:700;text-decoration:underline">$1</a>');
+
+    // Bold & italic
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+    // Bullets (•, *, -)
+    html = html.replace(/(?:^|\n)[•\*\-]\s+(.*?)(?=\n|$)/g, '<div style="display:flex;gap:6px;margin:3px 0 3px 4px"><span style="color:#4f46e5;font-weight:700;flex-shrink:0">•</span><div>$1</div></div>');
+
+    // Numbered lists (1., 2., etc.)
+    html = html.replace(/(?:^|\n)(\d+)\.\s+(.*?)(?=\n|$)/g, '<div style="display:flex;gap:6px;margin:3px 0 3px 4px"><span style="color:#4f46e5;font-weight:700;flex-shrink:0">$1.</span><div>$2</div></div>');
+
+    // Paragraph breaks
+    html = html.replace(/\n\n/g, '<div style="margin-top:6px"></div>');
+    html = html.replace(/\n/g, '<br>');
+
+    return html;
   }
 
   // -------------------------------------------------------------
@@ -2830,7 +2888,7 @@
         }
 
         const queue = getActiveQueue();
-        const reply = await AI.LLMService.askCopilot(text, queue, AppState.selectedSku, AppState.activeStore);
+        const reply = await AI.LLMService.askCopilot(text, queue, AppState.selectedSku, AppState.activeStore, AppState.copilotMessages);
 
         AppState.copilotMessages.push({ sender: 'bot', text: reply });
 
